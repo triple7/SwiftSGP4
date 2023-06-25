@@ -12,8 +12,8 @@ let package = Package(
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
-            name: "SGP4",
-            targets: ["SGP4"]),
+            name: "SwiftSGP4",
+            targets: ["SwiftSGP4"]),
     ],
     dependencies: [
         .package(url: "https://github.com/triple7/SwiftCelesTrak", branch:"main"),
