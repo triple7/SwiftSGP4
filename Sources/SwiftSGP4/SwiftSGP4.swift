@@ -62,6 +62,8 @@ public class SwiftSGP4 {
         satrec.elnum = target.ELEMENT_SET_NO
         satrec.revnum = target.REV_AT_EPOCH
         let arr2 = target.OBJECT_ID.cString(using: .utf8)!
+        print(arr2
+        )
         var tuple2 = (arr2[0], arr2[1], arr2[2], arr2[3], arr2[4], arr2[5])
         satrec.satnum = tuple2
         // Initialize sgp4 with the current parameters
