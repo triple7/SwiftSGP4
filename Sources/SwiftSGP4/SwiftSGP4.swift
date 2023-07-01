@@ -55,6 +55,7 @@ public class SwiftSGP4 {
         // populate satrec
         satrec.classification = target.CLASSIFICATION_TYPE.cString(using: .utf8)![0]
         let arr = target.OBJECT_ID.cString(using: .ascii)!
+        print(arr)
         let tuple = (arr[0], arr[1], arr[2], arr[3], arr[4], arr[5], arr[6], arr[7], arr[8], arr[9], arr[10])
         satrec.intldesg = tuple
         satrec.ephtype = target.EPHEMERIS_TYPE.int32()
