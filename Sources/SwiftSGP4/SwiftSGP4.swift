@@ -52,7 +52,8 @@ public class SwiftSGP4 {
         
         // populate satrec
         satrec.classification = target.CLASSIFICATION_TYPE.cString(using: .utf8)![0]
-        let arr = target.OBJECT_ID.cString(using: .utf8)!
+        let arr = target.OBJECT_NAME.cString(using: .utf8)!
+        print("\(target.OBJECT_NAME) \(target.OBJECT_NAME.count)")
 
         satrec.ephtype = target.EPHEMERIS_TYPE.int32()
         satrec.elnum = target.ELEMENT_SET_NO
