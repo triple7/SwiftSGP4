@@ -17,6 +17,14 @@ let utc2000 = calendar.date(from: utc2000Components)!
 extension SwiftSGP4 {
     
     
+    func getJulianFromUnix(_ unixSecs: Double) -> Double {
+        return (unixSecs / 86400.0) + 2440587.5
+    }
+
+    func getUnixFromJulian(_ julian: Double) -> UInt64 {
+        return UInt64((julian - 2440587.5) * 86400.0 + 0.5)
+    }
+
     func date2jday(_ dt: Date) -> Double {
         let dateUnix = dt.timeIntervalSince1970 * 1000
         let deltaMSec = (dateUnix - unix2000)

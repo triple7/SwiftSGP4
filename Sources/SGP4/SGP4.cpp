@@ -3776,7 +3776,7 @@ void teme2ecef(double rteme[3], double jdut1, double recef[3])
 /*
 polarm
 
-This function calulates the transformation matrix that accounts for polar
+This function calculates the transformation matrix that accounts for polar
 motion. Polar motion coordinates are estimated using IERS Bulletin
 rather than directly input for simplicity.
 
