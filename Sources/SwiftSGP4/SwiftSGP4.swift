@@ -54,7 +54,6 @@ public class SwiftSGP4 {
         satrec.classification = target.CLASSIFICATION_TYPE.cString(using: .utf8)![0]
         let arr = target.OBJECT_NAME.cString(using: .utf8)!
         print("\(target.OBJECT_NAME) \(target.OBJECT_NAME.count)")
-
         satrec.ephtype = target.EPHEMERIS_TYPE.int32()
         satrec.elnum = target.ELEMENT_SET_NO
         satrec.revnum = target.REV_AT_EPOCH
@@ -74,6 +73,7 @@ public class SwiftSGP4 {
 
             let deltaFromEpoch = Double(i)*delta
             sgp4(&satrec, deltaFromEpoch, &ro, &vo)
+            print("Got ro")
             // transform from TEME to GTRF
             var RGtrf = [Double](repeating: 0, count: 3)
             teme2ecef(&ro, epoch+deltaFromEpoch, &RGtrf)
