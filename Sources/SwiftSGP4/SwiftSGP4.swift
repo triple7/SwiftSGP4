@@ -95,7 +95,7 @@ public class SwiftSGP4 {
     private func timestampToJD( _ dateString: String)->Double {
         let date = dateString2Date( dateString)
         let calendar = Calendar.current
-        let  components  =  calendar.dateComponents([.year, .month, .day, .hour, .second],  from:  date)
+        let  components  =  calendar.dateComponents([.year, .month, .day, .hour, .minute, .second],  from:  date)
         let year = components.year!.int32()
         let month = components.month!.int32()
         let day = components.day!.int32()
