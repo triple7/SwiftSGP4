@@ -81,6 +81,7 @@ public class SwiftSGP4 {
     }
     
     private func timestampToJD( _ dateString: String)->Double {
+        print("Date is \(dateString)")
         let dateFormat = DateFormatter()
         dateFormat.timeZone = TimeZone(abbreviation: "UTC")
         dateFormat.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
