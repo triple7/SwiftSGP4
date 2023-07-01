@@ -23,22 +23,23 @@ public class SwiftSGP4 {
         self.rad = 180.0/self.pi
     }
 
-    public func propagateOmms(_ targets: [CelesTrakTarget], _ secondsFromEpoch: Int, _ fps: Int, _ minDelta: Double = 1/60 /* seconds */)->[SIMD3<Double>] {
-        var output = [SIMD3<Double>]()
+    public func propagateOmms(_ targets: [CelesTrakTarget], _ secondsFromEpoch: Int, _ fps: Int, _ minDelta: Double = 1/60 /* seconds */)->[[SIMD3<Double>]] {
         let epoch = targets.first!.EPOCH
         lastDate = dateString2Date(epoch)
         // Convert Jd
         let jdEpoch = timestampToJD(epoch)
 
                                    let count = targets.count
+        var output = [[SIMD3<Double>]](repeating: [zeroSimd], count: targets.count)
+
         DispatchQueue.concurrentPerform(iterations: count, execute:  { i in
-            output.append(contentsOf: computeITRF(targets[i], jdEpoch, secondsFromEpoch, fps, wgs84))
+            output[i] = computeITRF(targets[i], jdEpoch, secondsFromEpoch, fps, wgs84)
         })
         return output
     }
     
+    private let zeroSimd = SIMD3<Double>([0, 0, 0])
     public func computeITRF(_ target: CelesTrakTarget, _ epoch: Double, _ secondsFromEpoch: Int, _ fps: Int, _ grabConst:gravconsttype)->[SIMD3<Double>] {
-        var output = [SIMD3<Double>]()
         // time dimension parameters
         // We are propagating from
         // epoch to secondsFromEpoch by frames per second
@@ -47,13 +48,14 @@ public class SwiftSGP4 {
         // and count = seconds*fps
         let delta:Double = 1/Double(secondsFromEpoch*fps)
         let dCount = secondsFromEpoch*fps
+        var output = [SIMD3<Double>](repeating: zeroSimd, count: dCount)
+
         // struct to pass to sgp4 function
         var satrec = elsetrec()
         
         // populate satrec
         satrec.classification = target.CLASSIFICATION_TYPE.cString(using: .utf8)![0]
         let arr = target.OBJECT_NAME.cString(using: .utf8)!
-        print("\(target.OBJECT_NAME) \(target.OBJECT_NAME.count)")
         satrec.ephtype = target.EPHEMERIS_TYPE.int32()
         satrec.elnum = target.ELEMENT_SET_NO
         satrec.revnum = target.REV_AT_EPOCH
@@ -76,8 +78,7 @@ public class SwiftSGP4 {
             // transform from TEME to GTRF
             var RGtrf = [Double](repeating: 0, count: 3)
             teme2ecef(&ro, epoch+deltaFromEpoch, &RGtrf)
-            print(RGtrf)
-            output.append(SIMD3<Double>(RGtrf))
+            output[i] = SIMD3<Double>(RGtrf)
         })
         return output
     }
