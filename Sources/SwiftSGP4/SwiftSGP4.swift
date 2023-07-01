@@ -72,8 +72,8 @@ public class SwiftSGP4 {
             var vo = [Double](repeating: 0, count: 3)
 
             let deltaFromEpoch = Double(i)*delta
-            print("delta \(deltaFromEpoch)")
             sgp4(&satrec, deltaFromEpoch, &ro, &vo)
+            print(ro)
             // transform from TEME to GTRF
             var RGtrf = [Double](repeating: 0, count: 3)
             teme2ecef(&ro, epoch+deltaFromEpoch, &RGtrf)
