@@ -25,14 +25,19 @@ public class SwiftSGP4 {
 
     public func propagateOmms(_ targets: [CelesTrakTarget], _ secondsFromEpoch: Int, _ fps: Int, _ minDelta: Double = 1/60 /* seconds */)->[SIMD3<Double>] {
         var output = [SIMD3<Double>]()
-        let count = targets.count
+        let epoch = targets.first!.EPOCH
+        lastDate = dateString2Date(epoch)
+        // Convert Jd
+        let jdEpoch = timestampToJD(epoch)
+
+                                   let count = targets.count
         DispatchQueue.concurrentPerform(iterations: count, execute:  { i in
-            output.append(contentsOf: computeITRF(targets[i], secondsFromEpoch, fps, wgs84))
+            output.append(contentsOf: computeITRF(targets[i], jdEpoch, secondsFromEpoch, fps, wgs84))
         })
         return output
     }
     
-    public func computeITRF(_ target: CelesTrakTarget, _ secondsFromEpoch: Int, _ fps: Int, _ grabConst:gravconsttype)->[SIMD3<Double>] {
+    public func computeITRF(_ target: CelesTrakTarget, _ epoch: Double, _ secondsFromEpoch: Int, _ fps: Int, _ grabConst:gravconsttype)->[SIMD3<Double>] {
         var output = [SIMD3<Double>]()
         // time dimension parameters
         // We are propagating from
@@ -46,8 +51,6 @@ public class SwiftSGP4 {
         var satrec = elsetrec()
         
 
-        // Convert Jd
-        let epoch = timestampToJD(target.EPOCH)
         
         // populate satrec
         satrec.classification = target.CLASSIFICATION_TYPE.cString(using: .utf8)![0]
@@ -79,17 +82,20 @@ public class SwiftSGP4 {
         })
         return output
     }
-    
-    private func timestampToJD( _ dateString: String)->Double {
+
+    private func dateString2Date( _ dateString: String)->Date {
         print("Date is \(dateString)")
         let dateFormat = DateFormatter()
         dateFormat.timeZone = TimeZone(abbreviation: "UTC")
         dateFormat.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
-        lastDate = dateFormat.date(from: dateString)!
-
-        print("Last date: \(lastDate!)")
+        let date = dateFormat.date(from: dateString)!
+        return date
+    }
+    
+    private func timestampToJD( _ dateString: String)->Double {
+        let date = dateString2Date( dateString)
         let calendar = Calendar.current
-        let  components  =  calendar.dateComponents([.year, .month, .day, .hour, .second],  from:  lastDate!)
+        let  components  =  calendar.dateComponents([.year, .month, .day, .hour, .second],  from:  date)
         let year = components.year!.int32()
         let month = components.month!.int32()
         let day = components.day!.int32()
