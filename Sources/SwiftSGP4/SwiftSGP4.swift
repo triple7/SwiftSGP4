@@ -87,6 +87,7 @@ public class SwiftSGP4 {
         dateFormat.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
         lastDate = dateFormat.date(from: dateString)!
 
+        print("Last date: \(lastDate!)")
         let calendar = Calendar.current
         let  components  =  calendar.dateComponents([.year, .month, .day, .hour, .second],  from:  lastDate!)
         let year = components.year!.int32()
