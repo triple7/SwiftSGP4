@@ -58,8 +58,12 @@ public class SwiftSGP4 {
         
         print("objectId \(arr.count)")
         print(arr)
-        let tuple = (arr[0], arr[1], arr[2], arr[3], arr[4], arr[5], arr[6], arr[7], arr[8], arr[9], arr[10])
-        satrec.intldesg = tuple
+        if arr.count == 10 {
+            satrec.intldesg = (arr[0], arr[1], arr[2], arr[3], arr[4], arr[5], arr[6], arr[7], arr[8], arr[9], Int8(0))
+        } else {
+            satrec.intldesg = (arr[0], arr[1], arr[2], arr[3], arr[4], arr[5], arr[6], arr[7], arr[8], arr[9], arr[10])
+        }
+                      
         satrec.ephtype = target.EPHEMERIS_TYPE.int32()
         satrec.elnum = target.ELEMENT_SET_NO
         satrec.revnum = target.REV_AT_EPOCH
