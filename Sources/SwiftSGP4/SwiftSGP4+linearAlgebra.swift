@@ -61,7 +61,6 @@ extension SwiftSGP4 {
         return jd
     }
 
-
     func gstime(jdut1: Double) -> Double {
         let twopi = 2.0 * .pi
         let deg2rad = .pi / 180.0
