@@ -50,27 +50,15 @@ public class SwiftSGP4 {
         // struct to pass to sgp4 function
         var satrec = elsetrec()
         
-
-        
         // populate satrec
         satrec.classification = target.CLASSIFICATION_TYPE.cString(using: .utf8)![0]
-        let arr = target.OBJECT_ID.cString(using: .ascii)!
-        
-        print("objectId \(arr.count)")
-        print(arr)
-        if arr.count == 10 {
-            satrec.intldesg = (arr[0], arr[1], arr[2], arr[3], arr[4], arr[5], arr[6], arr[7], arr[8], arr[9], Int8(0))
-        } else {
-            satrec.intldesg = (arr[0], arr[1], arr[2], arr[3], arr[4], arr[5], arr[6], arr[7], arr[8], arr[9], arr[10])
-        }
-                      
+        let arr = target.OBJECT_ID.cString(using: .utf8)!
+
         satrec.ephtype = target.EPHEMERIS_TYPE.int32()
         satrec.elnum = target.ELEMENT_SET_NO
         satrec.revnum = target.REV_AT_EPOCH
         let arr2 = target.OBJECT_ID.cString(using: .utf8)!
-        print("objectId")
-        print(arr2
-        )
+        
         var tuple2 = (arr2[0], arr2[1], arr2[2], arr2[3], arr2[4], arr2[5])
         satrec.satnum = tuple2
         // Initialize sgp4 with the current parameters
