@@ -1,3 +1,6 @@
+#ifndef _SGP4h_
+#define _SGP4h_
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -6,6 +9,11 @@ extern "C" {
 #include <stdio.h>
 #include <string.h>
 #include<stdbool.h>
+
+/*
+These are the function declarations for the SGP4 satellite orbit model. The SGP4 library is commonly used for predicting the positions of satellites based on orbital elements. The functions provide various utilities for initializing the satellite's orbit, propagating the orbit over time, converting coordinates, and performing calculations related to orbital elements and time.
+The declarations include functions for initializing the satellite, propagating the orbit, converting between coordinate systems (e.g., Earth-centered Earth-fixed (ECEF) and geodetic), calculating satellite visibility (azimuth and elevation), and various mathematical operations.
+*/
 
 #define pi 3.14159265358979323846
 #define SGP4Version  "SGP4 Version 2023-06-16"
@@ -138,4 +146,6 @@ unsigned long getUnixFromJulian(double julian);
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif

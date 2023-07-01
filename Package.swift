@@ -24,6 +24,9 @@ let package = Package(
             path: "Sources/SGP4"),
         .target(
             name: "SwiftSGP4",
-            dependencies: ["SGP4", .product(name: "SwiftCelesTrak", package: "SwiftCelesTrak")])
+            dependencies: ["SGP4", .product(name: "SwiftCelesTrak", package: "SwiftCelesTrak")]),
+        .testTarget(
+            name: "SwiftSGP4Tests",
+            dependencies: ["SwiftSGP4"]),
     ]
 )
