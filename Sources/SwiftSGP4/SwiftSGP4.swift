@@ -88,6 +88,14 @@ public class SwiftSGP4 {
             teme2ecef(&ro, epoch+deltaFromEpoch, &RGtrf)
             output[i] = SIMD3<Double>(RGtrf)
         })
+        var distances = [Double]()
+        for v in output {
+            let distance = sqrt(v.x*v.x + v.y*v.y + v.z*v.z)
+            distances.append(distance)
+        }
+        print("sat Min distance \(distances.min()!)")
+        print("sat max distance: \(distances.max()!)")
+
         return output
     }
 

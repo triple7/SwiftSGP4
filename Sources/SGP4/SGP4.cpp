@@ -1945,7 +1945,6 @@ satrec->error = 6;
 return false;
 }
 
-//#include "debug7.cpp"
 return true;
 }  // sgp4
 
