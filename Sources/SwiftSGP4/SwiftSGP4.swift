@@ -38,11 +38,7 @@ public class SwiftSGP4 {
         var distances = [Double]()
         for o in output {
             let v = o.first!
-            let distance = sqrt(v.x*v.x
-                                + v.y
-                                *v.y
-                                + v.z
-                                *v.z)
+            let distance = sqrt(v.x*v.x + v.y*v.y + v.z*v.z)
             distances.append(distance)
         }
         print("Min distance \(distances.min()!)")
