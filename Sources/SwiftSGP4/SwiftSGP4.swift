@@ -62,15 +62,15 @@ public class SwiftSGP4 {
         var satrec = elsetrec()
         
         // populate satrec
-        satrec.classification = target.CLASSIFICATION_TYPE.cString(using: .utf8)![0]
-        let arr = target.OBJECT_NAME.cString(using: .utf8)!
-        satrec.ephtype = target.EPHEMERIS_TYPE.int32()
-        satrec.elnum = target.ELEMENT_SET_NO
-        satrec.revnum = target.REV_AT_EPOCH
+//        satrec.classification = target.CLASSIFICATION_TYPE.cString(using: .utf8)![0]
+//        let arr = target.OBJECT_NAME.cString(using: .utf8)!
+//        satrec.ephtype = target.EPHEMERIS_TYPE.int32()
+//        satrec.elnum = target.ELEMENT_SET_NO
+//        satrec.revnum = target.REV_AT_EPOCH
         let arr2 = target.OBJECT_ID.cString(using: .utf8)!
         
         var tuple2 = (arr2[0], arr2[1], arr2[2], arr2[3], arr2[4], arr2[5])
-        satrec.satnum = tuple2
+//        satrec.satnum = tuple2
         // Initialize sgp4 with the current parameters
         _ = sgp4init(wgs84, opsMode, &tuple2
                  , epoch, target.BSTAR, target.MEAN_MOTION_DOT, target.MEAN_MOTION_DDOT, target.ECCENTRICITY, target.ARG_OF_PERICENTER, target.INCLINATION, target.MEAN_ANOMALY, target.MEAN_MOTION, target.RA_OF_ASC_NODE, &satrec)

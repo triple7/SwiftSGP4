@@ -3718,9 +3718,7 @@ void teme2ecef(double rteme[3], double jdut1, double recef[3])
     double gmst;
     double st[3][3];
     double rpef[3];
-    //double vpef[3];
     double pm[3][3];
-    //double omegaearth[3];
     
     //Get Greenwich mean sidereal time
     gmst = gstime(jdut1);
