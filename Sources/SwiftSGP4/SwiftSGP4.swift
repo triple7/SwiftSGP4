@@ -35,6 +35,18 @@ public class SwiftSGP4 {
         DispatchQueue.concurrentPerform(iterations: count, execute:  { i in
             output[i] = computeITRF(targets[i], jdEpoch, secondsFromEpoch, fps, wgs84)
         })
+        var distances = [Double]()
+        for o in output {
+            let v = o.first!
+            let distance = sqrt(v.x*v.x
+                                + v.y
+                                *v.y
+                                + v.z
+                                *v.z)
+            distances.append(distance)
+        }
+        print("Min distance \(distances.min()!)")
+        print("max distance: \(distances.max()!)")
         return output
     }
     
@@ -84,7 +96,6 @@ public class SwiftSGP4 {
     }
 
     private func dateString2Date( _ dateString: String)->Date {
-        print("Date is \(dateString)")
         let dateFormat = DateFormatter()
         dateFormat.timeZone = TimeZone(abbreviation: "UTC")
         dateFormat.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
