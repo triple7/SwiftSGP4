@@ -32,8 +32,17 @@ public class SwiftSGP4 {
                                    let count = targets.count
         var output = [[SIMD3<Double>]](repeating: [zeroSimd], count: targets.count)
 
+        // time dimension parameters
+        // We are propagating from
+        // epoch to secondsFromEpoch by frames per second
+        // such that:
+        // delta = (1/(60*fps)
+        // and count = seconds*fps
+        let delta:Double = 1/Double(secondsFromEpoch*fps)
+        let dCount = secondsFromEpoch*fps
+
         DispatchQueue.concurrentPerform(iterations: count, execute:  { i in
-            output[i] = computeITRF(targets[i], jdEpoch, secondsFromEpoch, fps, wgs84)
+            output[i] = computeITRF(targets[i], jdEpoch, delta, dCount, wgs84)
         })
         var distances = [Double]()
         for o in output {
@@ -47,15 +56,8 @@ public class SwiftSGP4 {
     }
     
     private let zeroSimd = SIMD3<Double>([0, 0, 0])
-    public func computeITRF(_ target: CelesTrakTarget, _ epoch: Double, _ secondsFromEpoch: Int, _ fps: Int, _ grabConst:gravconsttype)->[SIMD3<Double>] {
-        // time dimension parameters
-        // We are propagating from
-        // epoch to secondsFromEpoch by frames per second
-        // such that:
-        // delta = (1/(60*fps)
-        // and count = seconds*fps
-        let delta:Double = 1/Double(secondsFromEpoch*fps)
-        let dCount = secondsFromEpoch*fps
+    public func computeITRF(_ target: CelesTrakTarget, _ epoch: Double, _ delta: Double, _ dCount
+                            : Int, _ grabConst:gravconsttype)->[SIMD3<Double>] {
         var output = [SIMD3<Double>](repeating: zeroSimd, count: dCount)
 
         // struct to pass to sgp4 function
@@ -88,13 +90,13 @@ public class SwiftSGP4 {
             teme2ecef(&ro, epoch+deltaFromEpoch, &RGtrf)
             output[i] = SIMD3<Double>(RGtrf)
         })
-        var distances = [Double]()
-        for v in output {
-            let distance = sqrt(v.x*v.x + v.y*v.y + v.z*v.z)
-            distances.append(distance)
-        }
-        print("sat Min distance \(distances.min()!)")
-        print("sat max distance: \(distances.max()!)")
+//        var distances = [Double]()
+//        for v in output {
+//            let distance = sqrt(v.x*v.x + v.y*v.y + v.z*v.z)
+//            distances.append(distance)
+//        }
+//        print("sat Min distance \(distances.min()!)")
+//        print("sat max distance: \(distances.max()!)")
 
         return output
     }
