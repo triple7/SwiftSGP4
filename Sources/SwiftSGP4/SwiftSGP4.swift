@@ -90,10 +90,11 @@ public class SwiftSGP4 {
             var ro = [Double](repeating: 0, count: 3)
             var vo = [Double](repeating: 0, count: 3)
 
-            sgp4(&satrec, epochs![i], &ro, &vo)
+            let epoch = epochs![i]
+            sgp4(&satrec, epoch, &ro, &vo)
             // transform from TEME to GTRF
             var RGtrf = [Double](repeating: 0, count: 3)
-            let gmst = gstime(jdut1: epochI)
+            let gmst = gstime(jdut1: epoch)
             let gmstCos = cos(gmst)
             let gmstSin = sin(gmst)
 
