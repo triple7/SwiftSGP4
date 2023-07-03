@@ -23,6 +23,9 @@ public class SwiftSGP4 {
         self.rad = 180.0/self.pi
     }
 
+    private var epochs:[Double]?
+    private var jdCos:[Double]?
+    private var jdSin:[Double]?
     public func propagateOmms(_ targets: [CelesTrakTarget], _ secondsFromEpoch: Int, _ fps: Int, _ minDelta: Double = 1/60 /* seconds */)->[[SIMD3<Double>]] {
         let epoch = targets.first!.EPOCH
         lastDate = dateString2Date(epoch)
@@ -40,7 +43,20 @@ public class SwiftSGP4 {
         // and count = seconds*fps
         let delta:Double = 1/Double(secondsFromEpoch*fps)
         let dCount = secondsFromEpoch*fps
-
+        // Create one epoch,  jdCos and jdSin arrays to not repeat across all sats
+        // and transformations of teme2ecef
+        epochs = [Double](repeating: 0, count: dCount)
+        jdCos = [Double](repeating: 0, count: dCount)
+        jdSin = [Double](repeating: 0, count: dCount)
+        
+        DispatchQueue.concurrentPerform(iterations: dCount, execute:  { i in
+            let epochI = jdEpoch + Double(i)*delta
+            epochs![i] = epochI
+            let gmst = gstime(jdut1: epochI)
+            jdCos![i] = cos(gmst)
+            jdSin![i] = sin(gmst)
+        })
+            
         DispatchQueue.concurrentPerform(iterations: count, execute:  { i in
             output[i] = computeITRF(targets[i], jdEpoch, delta, dCount, wgs84)
         })
@@ -83,20 +99,12 @@ public class SwiftSGP4 {
             var ro = [Double](repeating: 0, count: 3)
             var vo = [Double](repeating: 0, count: 3)
 
-            let deltaFromEpoch = Double(i)*delta
-            sgp4(&satrec, deltaFromEpoch, &ro, &vo)
+            sgp4(&satrec, epochs![i], &ro, &vo)
             // transform from TEME to GTRF
             var RGtrf = [Double](repeating: 0, count: 3)
-            teme2ecef(&ro, epoch+deltaFromEpoch, &RGtrf)
+            teme2ecefOptimised(&ro, epochs![i], jdCos![i], jdSin![i], &RGtrf)
             output[i] = SIMD3<Double>(RGtrf)
         })
-//        var distances = [Double]()
-//        for v in output {
-//            let distance = sqrt(v.x*v.x + v.y*v.y + v.z*v.z)
-//            distances.append(distance)
-//        }
-//        print("sat Min distance \(distances.min()!)")
-//        print("sat max distance: \(distances.max()!)")
 
         return output
     }

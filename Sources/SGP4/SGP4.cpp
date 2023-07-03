@@ -3763,6 +3763,54 @@ void teme2ecef(double rteme[3], double jdut1, double recef[3])
     //vecef[2] = pm[0][2] * vpef[0] + pm[1][2] * vpef[1] + pm[2][2] * vpef[2];
 }
 
+void teme2ecefOptimised(double rteme[3], double jdut1, double gmstCos, double gmstSin, double recef[3])
+{
+    double st[3][3];
+    double rpef[3];
+    double pm[3][3];
+    
+
+    //st is the pef - tod matrix
+    st[0][0] = gmstCos;
+    st[0][1] = -gmstSin;
+    st[0][2] = 0.0;
+    st[1][0] = gmstSin;
+    st[1][1] = gmstCos;
+    st[1][2] = 0.0;
+    st[2][0] = 0.0;
+    st[2][1] = 0.0;
+    st[2][2] = 1.0;
+    
+    //Get pseudo earth fixed position vector by multiplying the inverse pef-tod matrix by rteme
+    rpef[0] = st[0][0] * rteme[0] + st[1][0] * rteme[1] + st[2][0] * rteme[2];
+    rpef[1] = st[0][1] * rteme[0] + st[1][1] * rteme[1] + st[2][1] * rteme[2];
+    rpef[2] = st[0][2] * rteme[0] + st[1][2] * rteme[1] + st[2][2] * rteme[2];
+    
+    //Get polar motion vector
+    polarm(jdut1, pm);
+    
+    //ECEF postion vector is the inverse of the polar motion vector multiplied by rpef
+    recef[0] = pm[0][0] * rpef[0] + pm[1][0] * rpef[1] + pm[2][0] * rpef[2];
+    recef[1] = pm[0][1] * rpef[0] + pm[1][1] * rpef[1] + pm[2][1] * rpef[2];
+    recef[2] = pm[0][2] * rpef[0] + pm[1][2] * rpef[1] + pm[2][2] * rpef[2];
+    
+    //Earth's angular rotation vector (omega)
+    //Note: I don't have a good source for LOD. Historically it has been on the order of 2 ms so I'm just using that as a constant. The effect is very small.
+    //omegaearth[0] = 0.0;
+    //omegaearth[1] = 0.0;
+    //omegaearth[2] = 7.29211514670698e-05 * (1.0  - 0.0015563/86400.0);
+    
+    //Pseudo Earth Fixed velocity vector is st'*vteme - omegaearth X rpef
+    //vpef[0] = st[0][0] * vteme[0] + st[1][0] * vteme[1] + st[2][0] * vteme[2] - (omegaearth[1]*rpef[2] - omegaearth[2]*rpef[1]);
+    //vpef[1] = st[0][1] * vteme[0] + st[1][1] * vteme[1] + st[2][1] * vteme[2] - (omegaearth[2]*rpef[0] - omegaearth[0]*rpef[2]);
+    //vpef[2] = st[0][2] * vteme[0] + st[1][2] * vteme[1] + st[2][2] * vteme[2] - (omegaearth[0]*rpef[1] - omegaearth[1]*rpef[0]);
+    
+    //ECEF velocty vector is the inverse of the polar motion vector multiplied by vpef
+    //vecef[0] = pm[0][0] * vpef[0] + pm[1][0] * vpef[1] + pm[2][0] * vpef[2];
+    //vecef[1] = pm[0][1] * vpef[0] + pm[1][1] * vpef[1] + pm[2][1] * vpef[2];
+    //vecef[2] = pm[0][2] * vpef[0] + pm[1][2] * vpef[1] + pm[2][2] * vpef[2];
+}
+
 /*
 polarm
 

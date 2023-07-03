@@ -128,6 +128,8 @@ bool summertime(int year, int month, int day, int hour, int tzHours);
 
 void teme2ecef(double rteme[3], double jdut1, double recef[3]);
 
+void teme2ecefOptimised(double rteme[3], double jdut1, double gmstCos, double gmstSin, double recef[3]);
+
 void polarm(double jdut1, double pm[3][3]);
 
 void ijk2ll(double r[3], double latlongh[3]);
