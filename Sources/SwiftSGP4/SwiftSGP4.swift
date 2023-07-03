@@ -30,8 +30,8 @@ public class SwiftSGP4 {
         let jdEpoch = timestampToJD(epoch)
 
                                    let count = targets.count
-        var output = [[SIMD3<Double>]](repeating: [zeroSimd], count: targets.count)
-
+//        var output = [[SIMD3<Double>]](repeating: [zeroSimd], count: targets.count)
+var output = [[SIMD3<Double>]]()
         // time dimension parameters
         // We are propagating from
         // epoch to secondsFromEpoch by frames per second
@@ -41,9 +41,12 @@ public class SwiftSGP4 {
         let delta:Double = 1/Double(secondsFromEpoch*fps)
         let dCount = secondsFromEpoch*fps
             
-        DispatchQueue.concurrentPerform(iterations: count, execute:  { i in
-            output[i] = computeITRF(targets[i], jdEpoch, delta, dCount, wgs84)
-        })
+//        DispatchQueue.concurrentPerform(iterations: count, execute:  { i in
+//            output[i] = computeITRF(targets[i], jdEpoch, delta, dCount, wgs84)
+//        })
+        for t in targets {
+            output.append(computeITRF(t, jdEpoch, delta, dCount, wgs84))
+        }
         var distances = [Double]()
         for o in output {
             let v = o.first!
