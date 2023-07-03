@@ -23,7 +23,6 @@ public class SwiftSGP4 {
         self.rad = 180.0/self.pi
     }
 
-    private var epochs:[Double]?
     public func propagateOmms(_ targets: [CelesTrakTarget], _ secondsFromEpoch: Int, _ fps: Int, _ minDelta: Double = 1/60 /* seconds */)->[[SIMD3<Double>]] {
         let epoch = targets.first!.EPOCH
         lastDate = dateString2Date(epoch)
@@ -41,12 +40,6 @@ public class SwiftSGP4 {
         // and count = seconds*fps
         let delta:Double = 1/Double(secondsFromEpoch*fps)
         let dCount = secondsFromEpoch*fps
-        // Create one epoch array to not repeat across all sats
-        // and transformations of teme2ecef
-        epochs = [Double](repeating: 0, count: dCount)
-        DispatchQueue.concurrentPerform(iterations: dCount, execute:  { i in
-            epochs![i] = jdEpoch + Double(i)*delta
-        })
             
         DispatchQueue.concurrentPerform(iterations: count, execute:  { i in
             output[i] = computeITRF(targets[i], jdEpoch, delta, dCount, wgs84)
@@ -90,15 +83,15 @@ public class SwiftSGP4 {
             var ro = [Double](repeating: 0, count: 3)
             var vo = [Double](repeating: 0, count: 3)
 
-            let epoch = epochs![i]
-            sgp4(&satrec, epoch, &ro, &vo)
+            let epochI = epoch + Double(i)*delta
+            sgp4(&satrec, epochI, &ro, &vo)
             // transform from TEME to GTRF
             var RGtrf = [Double](repeating: 0, count: 3)
-            let gmst = gstime(jdut1: epoch)
+            let gmst = gstime(jdut1: epochI)
             let gmstCos = cos(gmst)
             let gmstSin = sin(gmst)
 
-            teme2ecefOptimised(&ro, epochs![i], gmstCos, gmstSin, &RGtrf)
+            teme2ecefOptimised(&ro, epochI, gmstCos, gmstSin, &RGtrf)
             output[i] = SIMD3<Double>(RGtrf)
         })
 
