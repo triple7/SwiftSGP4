@@ -43,14 +43,14 @@ public class SwiftSGP4 {
         DispatchQueue.concurrentPerform(iterations: count, execute:  { i in
             output[i] = computeITRF(targets[i], jdEpoch, delta, dCount, wgs84)
         })
-//        var distances = [Double]()
-//        for o in output {
-//            let v = o.first!
-//            let distance = sqrt(v.x*v.x + v.y*v.y + v.z*v.z)
-//            distances.append(distance)
-//        }
-//        print("Min distance \(distances.min()!)")
-//        print("max distance: \(distances.max()!)")
+        var distances = [Double]()
+        for o in output {
+            let v = o.first!
+            let distance = sqrt(v.x*v.x + v.y*v.y + v.z*v.z)
+            distances.append(distance)
+        }
+        print("Min distance \(distances.min()!)")
+        print("max distance: \(distances.max()!)")
         return output
     }
     
