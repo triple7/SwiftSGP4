@@ -86,13 +86,13 @@ public class SwiftSGP4 {
 //            let epoch1 = epoch + lastSince
             sgp4(&satrec, lastSince, &ro, &vo)
             // transform from TEME to GTRF
-            var RGtrf = [Double](repeating: 0, count: 3)
-            let gmst = gstime(jdut1: epoch)
-            let gmstCos = cos(gmst)
-            let gmstSin = sin(gmst)
+//            var RGtrf = [Double](repeating: 0, count: 3)
+//            let gmst = gstime(jdut1: epoch)
+//            let gmstCos = cos(gmst)
+//            let gmstSin = sin(gmst)
 
-            teme2ecefOptimised(&ro, epoch, gmstCos, gmstSin, &RGtrf)
-            output[i] = SIMD3<Double>(RGtrf)
+//            teme2ecefOptimised(&ro, epoch, gmstCos, gmstSin, &RGtrf)
+            output[i] = SIMD3<Double>(ro)
         })
 
         return output
