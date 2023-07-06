@@ -99,6 +99,7 @@ public class SwiftSGP4 {
             for o in output {
                 distances.append(sqrt(o.x*o.x + o.y*o.y + o.z*o.z))
             }
+            print("ISS min: \(distances.min()!) \(distances.max()!)")
         }
         return output
     }
