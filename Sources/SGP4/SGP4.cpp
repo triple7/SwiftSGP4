@@ -191,12 +191,11 @@ char opsmode
 {
 /* --------------------- local variables ------------------------ */
 const double twopi = 2.0 * pi;
-double alfdp, betdp, cosip, cosop, dalf, dbet, dls,
-f2, f3, pe, pgh, ph, pinc, pl,
-sel, ses, sghl, sghs, shll, shs, sil,
-sinip, sinop, sinzf, sis, sll, sls, xls,
-xnoh, zf, zm, zel, zes, znl, zns;
-
+    double alfdp = 0, betdp = 0, cosip = 0, cosop = 0, dalf = 0, dbet = 0, dls,
+    f2 = 0, f3 = 0, pe = 0, pgh = 0, ph = 0, pinc = 0, pl,
+    sel = 0, ses = 0, sghl = 0, sghs = 0, shll = 0, shs = 0, sil,
+    sinip = 0, sinop = 0, sinzf = 0, sis = 0, sll = 0, sls = 0, xls,
+    xnoh = 0, zf = 0, zm = 0, zel = 0, zes = 0, znl = 0, zns = 0;
 /* ---------------------- constants ----------------------------- */
 zns = 1.19459e-5;
 zes = 0.01675;
@@ -408,12 +407,12 @@ const double twopi = 2.0 * pi;
 
 /* --------------------- local variables ------------------------ */
 int lsflg;
-double a1, a2, a3, a4, a5, a6, a7,
-a8, a9, a10, betasq, cc, ctem, stem,
-x1, x2, x3, x4, x5, x6, x7,
-x8, xnodce, xnoi, zcosg, zcosgl, zcosh, zcoshl,
-zcosi, zcosil, zsing, zsingl, zsinh, zsinhl, zsini,
-zsinil, zx, zy;
+    double a1 = 0, a2 = 0, a3 = 0, a4 = 0, a5 = 0, a6 = 0, a7,
+    a8 = 0, a9 = 0, a10 = 0, betasq = 0, cc = 0, ctem = 0, stem,
+    x1 = 0, x2 = 0, x3 = 0, x4 = 0, x5 = 0, x6 = 0, x7,
+    x8 = 0, xnodce = 0, xnoi = 0, zcosg = 0, zcosgl = 0, zcosh = 0, zcoshl,
+    zcosi = 0, zcosil = 0, zsing = 0, zsingl = 0, zsinh = 0, zsinhl = 0, zsini,
+    zsinil = 0, zx = 0, zy = 0;
 
 nm = np;
 em = ep;
@@ -679,14 +678,14 @@ double& xfact, double& xlamo, double& xli, double& xni
 /* --------------------- local variables ------------------------ */
 const double twopi = 2.0 * pi;
 
-double ainv2, aonv = 0.0, cosisq, eoc, f220, f221, f311,
-f321, f322, f330, f441, f442, f522, f523,
-f542, f543, g200, g201, g211, g300, g310,
-g322, g410, g422, g520, g521, g532, g533,
-ses, sgs, sghl, sghs, shs, shll, sis,
-sini2, sls, temp, temp1, theta, xno2, q22,
-q31, q33, root22, root44, root54, rptim, root32,
-root52, x2o3, znl, emo, zns, emsqo;
+    double ainv2 = 0, aonv = 0, cosisq = 0, eoc = 0, f220 = 0, f221 = 0, f311,
+    f321 = 0, f322 = 0, f330 = 0, f441 = 0, f442 = 0, f522 = 0, f523,
+    f542 = 0, f543 = 0, g200 = 0, g201 = 0, g211 = 0, g300 = 0, g310,
+    g322 = 0, g410 = 0, g422 = 0, g520 = 0, g521 = 0, g532 = 0, g533,
+    ses = 0, sgs = 0, sghl = 0, sghs = 0, shs = 0, shll = 0, sis,
+    sini2 = 0, sls = 0, temp = 0, temp1 = 0, theta = 0, xno2 = 0, q22,
+    q31 = 0, q33 = 0, root22 = 0, root44 = 0, root54 = 0, rptim = 0, root32,
+    root52 = 0, x2o3 = 0, znl = 0, emo = 0, zns = 0, emsqo = 0;
 
 q22 = 1.7891679e-6;
 q31 = 2.1460748e-6;
@@ -1156,7 +1155,7 @@ double& rp, double& rteosq, double& sinio, double& gsto, double& no_unkozai
 )
 {
 /* --------------------- local variables ------------------------ */
-double ak, d1, del, adel, po, x2o3;
+double ak = 0, d1 = 0, del = 0, adel = 0, po = 0, x2o3 = 0;
 
 // sgp4fix use old way of finding gst
 double ds70;
@@ -1296,21 +1295,21 @@ gsto = gstime(epoch + 2433281.5);
 ----------------------------------------------------------------------------*/
 bool sgp4init(gravconsttype whichconst, char opsmode, const char satn[9], const double epoch, const double xbstar, const double xndot, const double xnddot, const double xecco, const double xargpo, const double xinclo, const double xmo, const double xno_kozai, const double xnodeo, elsetrec* satrec) {
 /* --------------------- local variables ------------------------ */
-double ao, ainv, con42, cosio, sinio, cosio2, eccsq,
-omeosq, posq, rp, rteosq,
-cnodm, snodm, cosim, sinim, cosomm, sinomm, cc1sq,
-cc2, cc3, coef, coef1, cosio4, day, dndt,
-em, emsq, eeta, etasq, gam, argpm, nodem,
-inclm, mm, nm, perige, pinvsq, psisq, qzms24,
-rtemsq, s1, s2, s3, s4, s5, s6,
-s7, sfour, ss1, ss2, ss3, ss4, ss5,
-ss6, ss7, sz1, sz2, sz3, sz11, sz12,
-sz13, sz21, sz22, sz23, sz31, sz32, sz33,
-tc, temp, temp1, temp2, temp3, tsi, xpidot,
-xhdot1, z1, z2, z3, z11, z12, z13,
-z21, z22, z23, z31, z32, z33,
-qzms2t, ss, x2o3, r[3], v[3],
-delmotemp, qzms2ttemp, qzms24temp;
+    double ao = 0, ainv = 0, con42 = 0, cosio = 0, sinio = 0, cosio2 = 0, eccsq,
+    omeosq = 0, posq = 0, rp = 0, rteosq,
+    cnodm = 0, snodm = 0, cosim = 0, sinim = 0, cosomm = 0, sinomm = 0, cc1sq,
+    cc2 = 0, cc3 = 0, coef = 0, coef1 = 0, cosio4 = 0, day = 0, dndt,
+    em = 0, emsq = 0, eeta = 0, etasq = 0, gam = 0, argpm = 0, nodem,
+    inclm = 0, mm = 0, nm = 0, perige = 0, pinvsq = 0, psisq = 0, qzms24,
+    rtemsq = 0, s1 = 0, s2 = 0, s3 = 0, s4 = 0, s5 = 0, s6,
+    s7 = 0, sfour = 0, ss1 = 0, ss2 = 0, ss3 = 0, ss4 = 0, ss5,
+    ss6 = 0, ss7 = 0, sz1 = 0, sz2 = 0, sz3 = 0, sz11 = 0, sz12,
+    sz13 = 0, sz21 = 0, sz22 = 0, sz23 = 0, sz31 = 0, sz32 = 0, sz33,
+    tc = 0, temp = 0, temp1 = 0, temp2 = 0, temp3 = 0, tsi = 0, xpidot,
+    xhdot1 = 0, z1 = 0, z2 = 0, z3 = 0, z11 = 0, z12 = 0, z13,
+    z21 = 0, z22 = 0, z23 = 0, z31 = 0, z32 = 0, z33,
+    qzms2t = 0, ss = 0, x2o3 = 0, r[3] = {0, 0, 0}, v[3],
+    delmotemp = 0, qzms2ttemp = 0, qzms24temp = 0;
 
 /* ------------------------ initialization --------------------- */
 // sgp4fix divisor for divide by zero check on inclination
@@ -1944,7 +1943,6 @@ double r[3], double v[3]
         return false;
     }
 
-    //#include "debug7.cpp"
     return true;
 }  // sgp4
 
