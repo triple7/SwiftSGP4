@@ -27,7 +27,7 @@ public class SwiftSGP4 {
         let epoch = targets.first!.EPOCH
         lastDate = dateString2Date(epoch)
         // Convert Jd
-        let jdEpoch = timestampToJD(epoch)
+        let jdEpoch = date2jday(dateString2Date(epoch))
 
                                    let count = targets.count
         var output = [[SIMD3<Double>]](repeating: [zeroSimd], count: targets.count)
@@ -127,6 +127,7 @@ public class SwiftSGP4 {
         var jdFrac:Double = 0.0
         
         jday(year, month, day, hour, minutes, seconds, &jd, &jdFrac)
+        print("jd \(jd) frac \(jdFrac)")
         let epoch = jd + jdFrac
 return epoch
     }
