@@ -13,7 +13,7 @@ public class SwiftSGP4 {
     }()
     
     // improved algorithm
-    private let opsMode:CChar = "i".cString(using: .utf8)![0]
+    private let opsMode:CChar = "a".cString(using: .utf8)![0]
 // last time propagation was calculated
     private var lastDate:Date?
 
@@ -73,7 +73,7 @@ public class SwiftSGP4 {
         var tuple2 = (arr2[0], arr2[1], arr2[2], arr2[3], arr2[4], arr2[5])
 //        satrec.satnum = tuple2
         // Initialize sgp4 with the current parameters
-        let result = sgp4init(wgs84, opsMode, &tuple2
+        let result = sgp4init(wgs72, opsMode, &tuple2
                  , epoch, target.BSTAR, target.MEAN_MOTION_DOT, target.MEAN_MOTION_DDOT, target.ECCENTRICITY, target.ARG_OF_PERICENTER, target.INCLINATION, target.MEAN_ANOMALY, target.MEAN_MOTION, target.RA_OF_ASC_NODE, &satrec)
         
         // Calculate the target states from epoch to secondsFromEpoch
