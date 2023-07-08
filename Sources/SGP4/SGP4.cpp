@@ -1940,7 +1940,6 @@ double r[3], double v[3]
     // sgp4fix for decaying satellites
     if (mrt < 1.0)
     {
-        //         printf("# decay condition %11.6f \n",mrt);
         satrec->error = 6;
         return false;
     }
