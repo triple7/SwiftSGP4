@@ -45,7 +45,7 @@ extension SwiftSGP4 {
     }
 
     
-    func jday(year: Int, mon: Int, day: Int, hr: Int, minute: Int, sec: Double, timezone: Int, daylightsaving: Bool) -> Double {
+    func jDay(year: Int, mon: Int, day: Int, hr: Int, minute: Int, sec: Double, timezone: Int, daylightsaving: Bool) -> Double {
         let a: Double = 367.0 * Double(year)
         let b: Double = floor((7.0 * (Double(year) + floor(Double(mon + 9) / 12.0))) * 0.25)
         let c: Double = floor(275.0 * Double(mon) / 9.0)

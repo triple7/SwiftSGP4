@@ -125,7 +125,7 @@ public class SwiftSGP4 {
         var jd:Double = 0.0
         var jdFrac:Double = 0.0
         
-        jday_SGP4(year, month, day, hour, minutes, seconds, &jd, &jdFrac)
+        jday(year, month, day, hour, minutes, seconds, &jd, &jdFrac)
         let epoch = jd + jdFrac
 return epoch
     }

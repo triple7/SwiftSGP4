@@ -1210,7 +1210,7 @@ fk5r = 5.07551419432269442e-15;
 c1p2p = c1 + twopi;
 double gsto1 = fmod(thgr70 + c1*ds70 + c1p2p*tfrac + ts70*ts70*fk5r, twopi);
 if (gsto1 < 0.0)
-gsto = gstime_SGP4(epoch + 2433281.5);
+gsto = gstime(epoch + 2433281.5);
 }  // initl
 
 /*-----------------------------------------------------------------------------
@@ -2247,8 +2247,8 @@ year = satrec.epochyr + 2000;
 else
 year = satrec.epochyr + 1900;
 
-days2mdhms_SGP4(year, satrec.epochdays, &mon, &day, &hr, &minute, &sec);
-jday_SGP4(year, mon, day, hr, minute, sec, &satrec.jdsatepoch, &satrec.jdsatepochF);
+days2mdhms(year, satrec.epochdays, &mon, &day, &hr, &minute, &sec);
+jday(year, mon, day, hr, minute, sec, &satrec.jdsatepoch, &satrec.jdsatepochF);
 
 // ---- input start stop times manually
 if ((typerun != 'v') && (typerun != 'c'))
@@ -2260,12 +2260,12 @@ printf("input start prop year mon day hr min sec \n");
 // make sure there is no space at the end of the format specifiers in scanf!
 scanf("%i %i %i %i %i %lf", &startyear, &startmon, &startday, &starthr, &startmin, &startsec);
 fflush(stdin);
-jday_SGP4(startyear, startmon, startday, starthr, startmin, startsec, &jdstart, &jdstartF);
+jday(startyear, startmon, startday, starthr, startmin, startsec, &jdstart, &jdstartF);
 
 printf("input stop prop year mon day hr min sec \n");
 scanf("%i %i %i %i %i %lf", &stopyear, &stopmon, &stopday, &stophr, &stopmin, &stopsec);
 fflush(stdin);
-jday_SGP4(stopyear, stopmon, stopday, stophr, stopmin, stopsec, &jdstop, &jdstopF);
+jday(stopyear, stopmon, stopday, stophr, stopmin, stopsec, &jdstop, &jdstopF);
 
 startmfe = (jdstart - satrec.jdsatepoch) * 1440.0 + (jdstartF - satrec.jdsatepochF) * 1440.0;
 stopmfe = (jdstop - satrec.jdsatepoch) * 1440.0 + (jdstopF - satrec.jdsatepochF) * 1440.0;
@@ -2281,10 +2281,10 @@ scanf("%i %lf", &startyear, &startdayofyr);
 printf("input stop year dayofyr \n");
 scanf("%i %lf", &stopyear, &stopdayofyr);
 
-days2mdhms_SGP4(startyear, startdayofyr, &mon, &day, &hr, &minute, &sec);
-jday_SGP4(startyear, mon, day, hr, minute, sec, &jdstart, &jdstartF);
-days2mdhms_SGP4(stopyear, stopdayofyr, &mon, &day, &hr, &minute, &sec);
-jday_SGP4(stopyear, mon, day, hr, minute, sec, &jdstop, &jdstopF);
+days2mdhms(startyear, startdayofyr, &mon, &day, &hr, &minute, &sec);
+jday(startyear, mon, day, hr, minute, sec, &jdstart, &jdstartF);
+days2mdhms(stopyear, stopdayofyr, &mon, &day, &hr, &minute, &sec);
+jday(stopyear, mon, day, hr, minute, sec, &jdstop, &jdstopF);
 
 startmfe = (jdstart - satrec.jdsatepoch) * 1440.0 + (jdstartF - satrec.jdsatepochF) * 1440.0;
 stopmfe = (jdstop - satrec.jdsatepoch) * 1440.0 + (jdstopF - satrec.jdsatepochF) * 1440.0;
@@ -2319,214 +2319,9 @@ satrec.nodeo, &satrec);
     
 } // twoline2rv
 
-// older sgp4ext methods
 /* -----------------------------------------------------------------------------
 *
-*                           function gstime_SGP4
-*
-*  this function finds the greenwich sidereal time.
-*
-*  author        : david vallado                  719-573-2600    1 mar 2001
-*
-*  inputs          description                    range / units
-*    jdut1       - julian date in ut1             days from 4713 bc
-*
-*  outputs       :
-*    gstime      - greenwich sidereal time        0 to 2pi rad
-*
-*  locals        :
-*    temp        - temporary variable for doubles   rad
-*    tut1        - julian centuries from the
-*                  jan 1, 2000 12 h epoch (ut1)
-*
-*  coupling      :
-*    none
-*
-*  references    :
-*    vallado       2013, 187, eq 3-45
-* --------------------------------------------------------------------------- */
-
-double  gstime_SGP4
-(
-double jdut1
-)
-{
-const double twopi = 2.0 * pi;
-const double deg2rad = pi / 180.0;
-double       temp, tut1;
-
-tut1 = (jdut1 - 2451545.0) / 36525.0;
-temp = -6.2e-6* tut1 * tut1 * tut1 + 0.093104 * tut1 * tut1 +
-(876600.0 * 3600 + 8640184.812866) * tut1 + 67310.54841;  // sec
-temp = fmod(temp * deg2rad / 240.0, twopi); //360/86400 = 1/240, to deg, to rad
-
-// ------------------------ check quadrants ---------------------
-if (temp < 0.0)
-temp += twopi;
-
-return temp;
-}  // gstime
-
-double  sgn_SGP4
-(
-double x
-)
-{
-if (x < 0.0)
-{
-return -1.0;
-}
-else
-{
-return 1.0;
-}
-
-}  // sgn
-
-/* -----------------------------------------------------------------------------
-*
-*                           function mag_SGP4
-*
-*  this procedure finds the magnitude of a vector.
-*
-*  author        : david vallado                  719-573-2600    1 mar 2001
-*
-*  inputs          description                    range / units
-*    vec         - vector
-*
-*  outputs       :
-*    mag         - answer
-*
-*  locals        :
-*    none.
-*
-*  coupling      :
-*    none.
-* --------------------------------------------------------------------------- */
-
-double  mag_SGP4
-(
-double x[3]
-)
-{
-return sqrt(x[0] * x[0] + x[1] * x[1] + x[2] * x[2]);
-}  // mag
-
-/* -----------------------------------------------------------------------------
-*
-*                           procedure cross_SGP4
-*
-*  this procedure crosses two vectors.
-*
-*  author        : david vallado                  719-573-2600    1 mar 2001
-*
-*  inputs          description                    range / units
-*    vec1        - vector number 1
-*    vec2        - vector number 2
-*
-*  outputs       :
-*    outvec      - vector result of a x b
-*
-*  locals        :
-*    none.
-*
-*  coupling      :
-*    mag           magnitude of a vector
----------------------------------------------------------------------------- */
-
-void    cross_SGP4
-(
-double vec1[3], double vec2[3], double outvec[3]
-)
-{
-outvec[0] = vec1[1] * vec2[2] - vec1[2] * vec2[1];
-outvec[1] = vec1[2] * vec2[0] - vec1[0] * vec2[2];
-outvec[2] = vec1[0] * vec2[1] - vec1[1] * vec2[0];
-}  // end cross
-
-
-/* -----------------------------------------------------------------------------
-*
-*                           function dot_SGP4
-*
-*  this function finds the dot product of two vectors.
-*
-*  author        : david vallado                  719-573-2600    1 mar 2001
-*
-*  inputs          description                    range / units
-*    vec1        - vector number 1
-*    vec2        - vector number 2
-*
-*  outputs       :
-*    dot         - result
-*
-*  locals        :
-*    none.
-*
-*  coupling      :
-*    none.
-* --------------------------------------------------------------------------- */
-
-double  dot_SGP4
-(
-double x[3], double y[3]
-)
-{
-return (x[0] * y[0] + x[1] * y[1] + x[2] * y[2]);
-}  // dot
-
-/* -----------------------------------------------------------------------------
-*
-*                           procedure angle_SGP4
-*
-*  this procedure calculates the angle between two vectors.  the output is
-*    set to 999999.1 to indicate an undefined value.  be sure to check for
-*    this at the output phase.
-*
-*  author        : david vallado                  719-573-2600    1 mar 2001
-*
-*  inputs          description                    range / units
-*    vec1        - vector number 1
-*    vec2        - vector number 2
-*
-*  outputs       :
-*    theta       - angle between the two vectors  -pi to pi
-*
-*  locals        :
-*    temp        - temporary real variable
-*
-*  coupling      :
-*    dot           dot product of two vectors
-* --------------------------------------------------------------------------- */
-
-double  angle_SGP4
-(
-double vec1[3],
-double vec2[3]
-)
-{
-double small, undefined, magv1, magv2, temp;
-small = 0.00000001;
-undefined = 999999.1;
-
-magv1 = mag_SGP4(vec1);
-magv2 = mag_SGP4(vec2);
-
-if (magv1*magv2 > small*small)
-{
-temp = dot_SGP4(vec1, vec2) / (magv1*magv2);
-if (fabs(temp) > 1.0)
-temp = sgn_SGP4(temp) * 1.0;
-return acos(temp);
-}
-else
-return undefined;
-}  // angle
-
-
-/* -----------------------------------------------------------------------------
-*
-*                           function asinh_SGP4
+*                           function asinh
 *
 *  this function evaluates the inverse hyperbolic sine function.
 *
@@ -2545,7 +2340,7 @@ return undefined;
 *    none.
 * --------------------------------------------------------------------------- */
 
-double  asinh_SGP4
+double  asinh
 (
 double xval
 )
@@ -2553,563 +2348,17 @@ double xval
 return log(xval + sqrt(xval*xval + 1.0));
 }  // asinh
 
-
-/* -----------------------------------------------------------------------------
-*
-*                           function newtonnu_SGP4
-*
-*  this function solves keplers equation when the true anomaly is known.
-*    the mean and eccentric, parabolic, or hyperbolic anomaly is also found.
-*    the parabolic limit at 168ø is arbitrary. the hyperbolic anomaly is also
-*    limited. the hyperbolic sine is used because it's not double valued.
-*
-*  author        : david vallado                  719-573-2600   27 may 2002
-*
-*  revisions
-*    vallado     - fix small                                     24 sep 2002
-*
-*  inputs          description                    range / units
-*    ecc         - eccentricity                   0.0  to
-*    nu          - true anomaly                   -2pi to 2pi rad
-*
-*  outputs       :
-*    e0          - eccentric anomaly              0.0  to 2pi rad       153.02 ø
-*    m           - mean anomaly                   0.0  to 2pi rad       151.7425 ø
-*
-*  locals        :
-*    e1          - eccentric anomaly, next value  rad
-*    sine        - sine of e
-*    cose        - cosine of e
-*    ktr         - index
-*
-*  coupling      :
-*    asinh       - arc hyperbolic sine
-*
-*  references    :
-*    vallado       2013, 77, alg 5
-* --------------------------------------------------------------------------- */
-
-void newtonnu_SGP4
-(
-double ecc, double nu,
-double& e0, double& m
-)
+double  sgn(double x){
+if (x < 0.0)
 {
-double small, sine, cose;
-
-// ---------------------  implementation   ---------------------
-e0 = 999999.9;
-m = 999999.9;
-small = 0.00000001;
-
-// --------------------------- circular ------------------------
-if (fabs(ecc) < small)
-{
-m = nu;
-e0 = nu;
-}
-else
-// ---------------------- elliptical -----------------------
-if (ecc < 1.0 - small)
-{
-sine = (sqrt(1.0 - ecc*ecc) * sin(nu)) / (1.0 + ecc*cos(nu));
-cose = (ecc + cos(nu)) / (1.0 + ecc*cos(nu));
-e0 = atan2(sine, cose);
-m = e0 - ecc*sin(e0);
-}
-else
-// -------------------- hyperbolic  --------------------
-if (ecc > 1.0 + small)
-{
-if ((ecc > 1.0) && (fabs(nu) + 0.00001 < pi - acos(1.0 / ecc)))
-{
-sine = (sqrt(ecc*ecc - 1.0) * sin(nu)) / (1.0 + ecc*cos(nu));
-e0 = asinh_SGP4(sine);
-m = ecc*sinh(e0) - e0;
-}
-}
-else
-// ----------------- parabolic ---------------------
-if (fabs(nu) < 168.0*pi / 180.0)
-{
-e0 = tan(nu*0.5);
-m = e0 + (e0*e0*e0) / 3.0;
-}
-
-if (ecc < 1.0)
-{
-m = fmod(m, 2.0 *pi);
-if (m < 0.0)
-m = m + 2.0 *pi;
-e0 = fmod(e0, 2.0 *pi);
-}
-}  // newtonnu
-
-
-/* -----------------------------------------------------------------------------
-*
-*                           function rv2coe_SGP4
-*
-*  this function finds the classical orbital elements given the geocentric
-*    equatorial position and velocity vectors.
-*
-*  author        : david vallado                  719-573-2600   21 jun 2002
-*
-*  revisions
-*    vallado     - fix special cases                              5 sep 2002
-*    vallado     - delete extra check in inclination code        16 oct 2002
-*    vallado     - add constant file use                         29 jun 2003
-*    vallado     - add mu                                         2 apr 2007
-*
-*  inputs          description                    range / units
-*    r           - ijk position vector            km
-*    v           - ijk velocity vector            km / s
-*    mu          - gravitational parameter        km3 / s2
-*
-*  outputs       :
-*    p           - semilatus rectum               km
-*    a           - semimajor axis                 km
-*    ecc         - eccentricity
-*    incl        - inclination                    0.0  to pi rad
-*    omega       - right ascension of ascending node    0.0  to 2pi rad
-*    argp        - argument of perigee            0.0  to 2pi rad
-*    nu          - true anomaly                   0.0  to 2pi rad
-*    m           - mean anomaly                   0.0  to 2pi rad
-*    arglat      - argument of latitude      (ci) 0.0  to 2pi rad
-*    truelon     - true longitude            (ce) 0.0  to 2pi rad
-*    lonper      - longitude of periapsis    (ee) 0.0  to 2pi rad
-*
-*  locals        :
-*    hbar        - angular momentum h vector      km2 / s
-*    ebar        - eccentricity     e vector
-*    nbar        - line of nodes    n vector
-*    c1          - v**2 - u/r
-*    rdotv       - r dot v
-*    hk          - hk unit vector
-*    sme         - specfic mechanical energy      km2 / s2
-*    i           - index
-*    e           - eccentric, parabolic,
-*                  hyperbolic anomaly             rad
-*    temp        - temporary variable
-*    typeorbit   - type of orbit                  ee, ei, ce, ci
-*
-*  coupling      :
-*    mag         - magnitude of a vector
-*    cross       - cross product of two vectors
-*    angle       - find the angle between two vectors
-*    newtonnu    - find the mean anomaly
-*
-*  references    :
-*    vallado       2013, 113, alg 9, ex 2-5
-* --------------------------------------------------------------------------- */
-
-void rv2coe_SGP4
-(
-double r[3], double v[3], double mus,
-double& p, double& a, double& ecc, double& incl, double& omega, double& argp,
-double& nu, double& m, double& arglat, double& truelon, double& lonper
-)
-{
-double undefined, small, hbar[3], nbar[3], magr, magv, magn, ebar[3], sme,
-rdotv, infinite, temp, c1, hk, twopi, magh, halfpi, e;
-
-int i;
-// switch this to an integer msvs seems to have probelms with this and strncpy_s
-//char typeorbit[2];
-int typeorbit;
-// here
-// typeorbit = 1 = 'ei'
-// typeorbit = 2 = 'ce'
-// typeorbit = 3 = 'ci'
-// typeorbit = 4 = 'ee'
-
-twopi = 2.0 * pi;
-halfpi = 0.5 * pi;
-small = 0.00000001;
-undefined = 999999.1;
-infinite = 999999.9;
-
-// -------------------------  implementation   -----------------
-magr = mag_SGP4(r);
-magv = mag_SGP4(v);
-
-// ------------------  find h n and e vectors   ----------------
-cross_SGP4(r, v, hbar);
-magh = mag_SGP4(hbar);
-if (magh > small)
-{
-nbar[0] = -hbar[1];
-nbar[1] = hbar[0];
-nbar[2] = 0.0;
-magn = mag_SGP4(nbar);
-c1 = magv*magv - mus / magr;
-rdotv = dot_SGP4(r, v);
-for (i = 0; i <= 2; i++)
-ebar[i] = (c1*r[i] - rdotv*v[i]) / mus;
-ecc = mag_SGP4(ebar);
-
-// ------------  find a e and semi-latus rectum   ----------
-sme = (magv*magv*0.5) - (mus / magr);
-if (fabs(sme) > small)
-a = -mus / (2.0 *sme);
-else
-a = infinite;
-p = magh*magh / mus;
-
-// -----------------  find inclination   -------------------
-hk = hbar[2] / magh;
-incl = acos(hk);
-
-typeorbit = 1;
-
-if (ecc < small)
-{
-// ----------------  circular equatorial ---------------
-if ((incl < small) | (fabs(incl - pi) < small))
-{
-typeorbit = 2;
+return -1.0;
 }
 else
 {
-typeorbit = 3;
-}
-}
-else
-{
-// - elliptical, parabolic, hyperbolic equatorial --
-if ((incl < small) | (fabs(incl - pi) < small)){
-typeorbit = 4;
-}
+return 1.0;
 }
 
-// ----------  find right ascension of the ascending node ------------
-if (magn > small)
-{
-temp = nbar[0] / magn;
-if (fabs(temp) > 1.0)
-temp = sgn_SGP4(temp);
-omega = acos(temp);
-if (nbar[1] < 0.0)
-omega = twopi - omega;
-}
-else
-omega = undefined;
-
-// ---------------- find argument of perigee ---------------
-//if (strcmp(typeorbit, "ei") == 0)
-if (typeorbit == 1)
-{
-argp = angle_SGP4(nbar, ebar);
-if (ebar[2] < 0.0)
-argp = twopi - argp;
-}
-else
-argp = undefined;
-
-// ------------  find true anomaly at epoch    -------------
-//if (typeorbit[0] == 'e')
-if ((typeorbit == 1) || (typeorbit == 4))
-{
-nu = angle_SGP4(ebar, r);
-if (rdotv < 0.0)
-nu = twopi - nu;
-}
-else
-nu = undefined;
-
-// ----  find argument of latitude - circular inclined -----
-//if (strcmp(typeorbit, "ci") == 0)
-if (typeorbit == 3)
-{
-arglat = angle_SGP4(nbar, r);
-if (r[2] < 0.0)
-arglat = twopi - arglat;
-m = arglat;
-}
-else
-arglat = undefined;
-
-// -- find longitude of perigee - elliptical equatorial ----
-//if ((ecc>small) && (strcmp(typeorbit, "ee") == 0))
-if ((ecc>small) && (typeorbit == 4))
-{
-temp = ebar[0] / ecc;
-if (fabs(temp) > 1.0)
-temp = sgn_SGP4(temp);
-lonper = acos(temp);
-if (ebar[1] < 0.0)
-lonper = twopi - lonper;
-if (incl > halfpi)
-lonper = twopi - lonper;
-}
-else
-lonper = undefined;
-
-// -------- find true longitude - circular equatorial ------
-//if ((magr>small) && (strcmp(typeorbit, "ce") == 0))
-if ((magr > small) && (typeorbit == 2))
-{
-temp = r[0] / magr;
-if (fabs(temp) > 1.0)
-temp = sgn_SGP4(temp);
-truelon = acos(temp);
-if (r[1] < 0.0)
-truelon = twopi - truelon;
-if (incl > halfpi)
-truelon = twopi - truelon;
-m = truelon;
-}
-else
-truelon = undefined;
-
-// ------------ find mean anomaly for all orbits -----------
-//if (typeorbit[0] == 'e')
-if ((typeorbit == 1) || (typeorbit == 4))
-newtonnu_SGP4(ecc, nu, e, m);
-}
-else
-{
-p = undefined;
-a = undefined;
-ecc = undefined;
-incl = undefined;
-omega = undefined;
-argp = undefined;
-nu = undefined;
-m = undefined;
-arglat = undefined;
-truelon = undefined;
-lonper = undefined;
-}
-}  // rv2coe
-
-
-/* -----------------------------------------------------------------------------
-*
-*                           procedure jday_SGP4
-*
-*  this procedure finds the julian date given the year, month, day, and time.
-*    the julian date is defined by each elapsed day since noon, jan 1, 4713 bc.
-*
-*  algorithm     : calculate the answer in one step for efficiency
-*
-*  author        : david vallado                  719-573-2600    1 mar 2001
-*
-*  inputs          description                    range / units
-*    year        - year                           1900 .. 2100
-*    mon         - month                          1 .. 12
-*    day         - day                            1 .. 28,29,30,31
-*    hr          - universal time hour            0 .. 23
-*    min         - universal time min             0 .. 59
-*    sec         - universal time sec             0.0 .. 59.999
-*
-*  outputs       :
-*    jd          - julian date                    days from 4713 bc
-*    jdfrac      - julian date fraction into day  days from 4713 bc
-*
-*  locals        :
-*    none.
-*
-*  coupling      :
-*    none.
-*
-*  references    :
-*    vallado       2013, 183, alg 14, ex 3-4
-* --------------------------------------------------------------------------- */
-
-void    jday_SGP4
-(
-int year, int mon, int day, int hr, int minute, double sec,
-double* jd, double* jdFrac
-)
-{
-*jd = 367.0 * year -
-floor((7 * (year + floor((mon + 9) / 12.0))) * 0.25) +
-floor(275 * mon / 9.0) +
-day + 1721013.5;  // use - 678987.0 to go to mjd directly
-*jdFrac = (sec + minute * 60.0 + hr * 3600.0) / 86400.0;
-
-// check that the day and fractional day are correct
-if (fabs(*jdFrac) > 1.0)
-{
-double dtt = floor(*jdFrac);
-*jd = *jd + dtt;
-*jdFrac = *jdFrac - dtt;
-}
-}  // jday
-
-
-/* -----------------------------------------------------------------------------
-*
-*                           procedure days2mdhms_SGP4
-*
-*  this procedure converts the day of the year, days, to the equivalent month
-*    day, hour, minute and second.
-*
-*  algorithm     : set up array for the number of days per month
-*                  find leap year - use 1900 because 2000 is a leap year
-*                  loop through a temp value while the value is < the days
-*                  perform int conversions to the correct day and month
-*                  convert remainder into h m s using type conversions
-*
-*  author        : david vallado                  719-573-2600    1 mar 2001
-*
-*  inputs          description                    range / units
-*    year        - year                           1900 .. 2100
-*    days        - julian day of the year         1.0  .. 366.0
-*
-*  outputs       :
-*    mon         - month                          1 .. 12
-*    day         - day                            1 .. 28,29,30,31
-*    hr          - hour                           0 .. 23
-*    min         - minute                         0 .. 59
-*    sec         - second                         0.0 .. 59.999
-*
-*  locals        :
-*    dayofyr     - day of year
-*    temp        - temporary extended values
-*    inttemp     - temporary int value
-*    i           - index
-*    lmonth[13]  - int array containing the number of days per month
-*
-*  coupling      :
-*    none.
-* --------------------------------------------------------------------------- */
-
-void    days2mdhms_SGP4
-(
-int year, double days,
-int* mon, int* day, int* hr, int* minute, double* sec
-)
-{
-int i, inttemp, dayofyr;
-double    temp;
-int lmonth[] = { 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-
-dayofyr = (int)floor(days);
-/* ----------------- find month and day of month ---------------- */
-if ((year % 4) == 0)
-lmonth[2] = 29;
-
-i = 1;
-inttemp = 0;
-while ((dayofyr > inttemp + lmonth[i]) && (i < 12))
-{
-inttemp = inttemp + lmonth[i];
-i++;
-}
-*mon = i;
-*day = dayofyr - inttemp;
-
-/* ----------------- find hours minutes and seconds ------------- */
-temp = (days - dayofyr) * 24.0;
-*hr = (int)floor(temp);
-temp = (temp - *hr) * 60.0;
-*minute = (int)floor(temp);
-*sec = (temp - *minute) * 60.0;
-}  // days2mdhms
-
-/* -----------------------------------------------------------------------------
-*
-*                           procedure invjday_SGP4
-*
-*  this procedure finds the year, month, day, hour, minute and second
-*  given the julian date. tu can be ut1, tdt, tdb, etc.
-*
-*  algorithm     : set up starting values
-*                  find leap year - use 1900 because 2000 is a leap year
-*                  find the elapsed days through the year in a loop
-*                  call routine to find each individual value
-*
-*  author        : david vallado                  719-573-2600    1 mar 2001
-*
-*  inputs          description                    range / units
-*    jd          - julian date                    days from 4713 bc
-*    jdfrac      - julian date fraction into day  days from 4713 bc
-*
-*  outputs       :
-*    year        - year                           1900 .. 2100
-*    mon         - month                          1 .. 12
-*    day         - day                            1 .. 28,29,30,31
-*    hr          - hour                           0 .. 23
-*    min         - minute                         0 .. 59
-*    sec         - second                         0.0 .. 59.999
-*
-*  locals        :
-*    days        - day of year plus fractional
-*                  portion of a day               days
-*    tu          - julian centuries from 0 h
-*                  jan 0, 1900
-*    temp        - temporary double values
-*    leapyrs     - number of leap years from 1900
-*
-*  coupling      :
-*    days2mdhms  - finds month, day, hour, minute and second given days and year
-*
-*  references    :
-*    vallado       2013, 203, alg 22, ex 3-13
-* --------------------------------------------------------------------------- */
-
-void    invjday_SGP4
-(
-double jd, double jdfrac,
-int& year, int& mon, int& day,
-int& hr, int& minute, double& sec
-)
-{
-int leapyrs;
-double dt, days, tu, temp;
-
-// check jdfrac for multiple days
-if (fabs(jdfrac) >= 1.0)
-{
-jd = jd + floor(jdfrac);
-jdfrac = jdfrac - floor(jdfrac);
-}
-
-// check for fraction of a day included in the jd
-dt = jd - floor(jd) - 0.5;
-if (fabs(dt) > 0.00000001)
-{
-jd = jd - dt;
-jdfrac = jdfrac + dt;
-}
-
-/* --------------- find year and days of the year --------------- */
-temp = jd - 2415019.5;
-tu = temp / 365.25;
-year = 1900 + (int)floor(tu);
-leapyrs = (int)floor((year - 1901) * 0.25);
-
-days = floor(temp - ((year - 1900) * 365.0 + leapyrs));
-
-/* ------------ check for case of beginning of a year ----------- */
-if (days + jdfrac < 1.0)
-{
-year = year - 1;
-leapyrs = (int)floor((year - 1901) * 0.25);
-days = floor(temp - ((year - 1900) * 365.0 + leapyrs));
-}
-
-/* ----------------- find remaining data  ------------------------- */
-days2mdhms_SGP4(year, days + jdfrac, &mon, &day, &hr, &minute, &sec);
-}  // invjday
-
-double  sgn
-        (
-          double x
-        )
-   {
-     if (x < 0.0)
-       {
-          return -1.0;
-       }
-       else
-       {
-          return 1.0;
-       }
-
-   }  // end sgn
+}  // sgn
 
 double  mag
         (
@@ -3231,7 +2480,7 @@ void newtonnu
                  if ((ecc > 1.0 ) && (fabs(nu)+0.00001 < pi-acos(1.0 /ecc)))
                    {
                      sine= ( sqrt( ecc*ecc-1.0  ) * sin(nu) ) / ( 1.0  + ecc*cos(nu) );
-                     *e0  = asinh_SGP4( sine );
+                     *e0  = asinh( sine );
                      *m   = ecc*sinh(*e0) - *e0;
                    }
                 }
@@ -3510,18 +2759,25 @@ void rv2coe
 * --------------------------------------------------------------------------- */
 
 void    jday
-        (
-          int year, int mon, int day, int hr, int minute, double sec,
-          int timezone, bool daylightsaving, double* jd
-        )
-   {
-     *jd = 367.0 * year -
-          floor((7 * (year + floor((mon + 9) / 12.0))) * 0.25) +
-          floor( 275 * mon / 9.0 ) +
-          day + 1721013.5 +
-          ((sec / 60.0 + minute) / 60.0 + hr - timezone - (daylightsaving && summertime(year,mon,day,hr,timezone))) / 24.0;  // ut in days
-          // - 0.5*sgn(100.0*year + mon - 190002.5) + 0.5;
-   }  // end jday
+(
+int year, int mon, int day, int hr, int minute, double sec,
+double* jd, double* jdFrac
+)
+{
+*jd = 367.0 * year -
+floor((7 * (year + floor((mon + 9) / 12.0))) * 0.25) +
+floor(275 * mon / 9.0) +
+day + 1721013.5;  // use - 678987.0 to go to mjd directly
+*jdFrac = (sec + minute * 60.0 + hr * 3600.0) / 86400.0;
+
+// check that the day and fractional day are correct
+if (fabs(*jdFrac) > 1.0)
+{
+double dtt = floor(*jdFrac);
+*jd = *jd + dtt;
+*jdFrac = *jdFrac - dtt;
+}
+}  // jday
 
 
 /* -----------------------------------------------------------------------------

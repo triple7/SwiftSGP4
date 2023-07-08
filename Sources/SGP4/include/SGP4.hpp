@@ -77,31 +77,9 @@ void getgravconst(gravconsttype whichconst,double* tumin,double* mus,double* rad
 // older sgp4io methods
 void twoline2rv(char      longstr1[130], char longstr2[130],char      typerun, char typeinput, char opsmode,gravconsttype       whichconst,double* startmfe, double* stopmfe, double* deltamin,elsetrec* satrec);
 
-// older sgp4ext methods
-double gstime_SGP4(double jdut1);
+double asinh(double xval);
 
-double sgn_SGP4(double x);
-
-double mag_SGP4(double x[3]);
-
-void cross_SGP4(double vec1[3], double vec2[3], double outvec[3]);
-
-double dot_SGP4(double x[3], double y[3]);double angle_SGP4(double vec1[3],double vec2[3]);
-
-void newtonnu_SGP4(double ecc, double nu, double* e0, double* m);
-
-double asinh_SGP4(double xval);
-
-void rv2coe_SGP4(double r[3], double v[3], double mus,
-double* p, double* a, double* ecc, double* incl, double* omega, double* argp,double* nu, double* m, double* arglat, double* truelon, double* lonper);
-
-void jday_SGP4(int year, int mon, int day, int hr, int minute, double sec,double* jd, double* jdFrac);
-
-void days2mdhms_SGP4(int year, double days, int*mon, int* day, int* hr, int* minute, double* sec);
-
-void invjday_SGP4(double jd, double jdFrac, int* year, int* mon, int* day, int* hr, int* minute, double* sec);
-
-double  sgn(double x);
+double sgn(double x);
 
 double  mag(double x[3]);
 
@@ -115,12 +93,12 @@ void    newtonnu(double ecc, double nu, double* e0, double* m);
 
 void    rv2coe(double r[3], double v[3], double mu, double* p, double* a, double* ecc, double* incl, double* omega, double* argp,          double* nu, double* m, double* arglat, double* truelon, double* lonper);
 
-void    jday(int year, int mon, int day, int hr, int minute, double sec, int timezone, bool daylightsaving, double* jd);
+void jday(int year, int mon, int day, int hr, int minute, double sec,double* jd, double* jdFrac);
 
 void days2mdhms(int year, double days, int* mon, int* day, int* hr, int* minute, double* sec);
 
 void    invjday(double jd, int timezone, bool daylightsaving, int* year, int* mon, int* day,
-          int* hr, int* minute, double* sec);
+          int* hour, int* minute, double* sec);
 
 double floatmod(double a, double b);
 
