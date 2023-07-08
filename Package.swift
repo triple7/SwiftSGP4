@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "SwiftSGP4",
     platforms: [
-        .iOS("16"),
+        .iOS("13.1"),
         .macOS("13"),
 ],
     products: [
