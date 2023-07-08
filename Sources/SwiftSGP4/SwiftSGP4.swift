@@ -55,14 +55,14 @@ public class SwiftSGP4 {
         DispatchQueue.concurrentPerform(iterations: count, execute:  { i in
             output[i] = computeITRF(targets[i], jdEpoch, delta, dCount, wgs84)
         })
-        var distances = [Double]()
-        for o in output {
-            let v = o.first!
-            let distance = sqrt(v.x*v.x + v.y*v.y + v.z*v.z)
-            distances.append(distance)
-        }
-        print("Min distance \(distances.min()!)")
-        print("max distance: \(distances.max()!)")
+//        var distances = [Double]()
+//        for o in output {
+//            let v = o.first!
+//            let distance = sqrt(v.x*v.x + v.y*v.y + v.z*v.z)
+//            distances.append(distance)
+//        }
+//        print("Min distance \(distances.min()!)")
+//        print("max distance: \(distances.max()!)")
         return output
     }
     
@@ -85,7 +85,7 @@ public class SwiftSGP4 {
         var tuple2 = (arr2[0], arr2[1], arr2[2], arr2[3], arr2[4], arr2[5])
 //        satrec.satnum = tuple2
         // Initialize sgp4 with the current parameters
-        let result = sgp4init(wgs84, opsMode, &tuple2
+        _ = sgp4init(wgs84, opsMode, &tuple2
                  , epoch, target.BSTAR, target.MEAN_MOTION_DOT/xpdotInv, target.MEAN_MOTION_DDOT/xpdotInv2, target.ECCENTRICITY*deg2rad, target.ARG_OF_PERICENTER*deg2rad, target.INCLINATION*deg2rad, target.MEAN_ANOMALY*deg2rad, target.MEAN_MOTION/xpdotp, target.RA_OF_ASC_NODE*deg2rad, &satrec)
         
         // Calculate the target states from epoch to secondsFromEpoch
@@ -113,7 +113,6 @@ public class SwiftSGP4 {
             }
             print("ISS min: \(distances.min()!) \(distances.max()!)")
         }
-        print("SGP4 result \(result) error \(satrec.error)")
         return output
     }
 
