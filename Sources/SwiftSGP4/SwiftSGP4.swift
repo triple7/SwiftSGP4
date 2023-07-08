@@ -6,6 +6,12 @@ import Foundation
 public class SwiftSGP4 {
     private let pi:Double = 3.14159265358979323846
     private let rad:Double
+    private let deg2rad:Double
+    private let xpdotp:Double
+    private let xpdotInv:Double
+    private let xpdotInv2:Double
+    private let minPDay:Double
+    private let secPDay:Double
     private var targets:[CelesTrakTarget]
     private var satRecs:[elsetrec]
     private lazy var coordinates:[SIMD3<Double>] = {
@@ -13,7 +19,7 @@ public class SwiftSGP4 {
     }()
     
     // improved algorithm
-    private let opsMode:CChar = "a".cString(using: .utf8)![0]
+    private let opsMode:CChar = "i".cString(using: .utf8)![0]
 // last time propagation was calculated
     private var lastDate:Date?
 
@@ -21,13 +27,19 @@ public class SwiftSGP4 {
         self.targets = targets
         self.satRecs = [elsetrec]()
         self.rad = 180.0/self.pi
+        self.deg2rad = pi / 180.0
+        self.xpdotp = 1440.0/(2.0*pi)
+        self.xpdotInv = self.xpdotp*1440
+        self.xpdotInv2 = self.xpdotp*1440*1440
+        self.minPDay = 1440
+        self.secPDay = 1440*60
     }
 
     public func propagateOmms(_ targets: [CelesTrakTarget], _ secondsFromEpoch: Int, _ fps: Int, _ minDelta: Double = 1/60 /* seconds */)->[[SIMD3<Double>]] {
         let epoch = targets.first!.EPOCH
         lastDate = dateString2Date(epoch)
         // Convert Jd
-        let jdEpoch = date2jday(dateString2Date(epoch))
+        let jdEpoch = timestampToJD(epoch)
 
                                    let count = targets.count
         var output = [[SIMD3<Double>]](repeating: [zeroSimd], count: targets.count)
@@ -73,8 +85,8 @@ public class SwiftSGP4 {
         var tuple2 = (arr2[0], arr2[1], arr2[2], arr2[3], arr2[4], arr2[5])
 //        satrec.satnum = tuple2
         // Initialize sgp4 with the current parameters
-        let result = sgp4init(wgs72, opsMode, &tuple2
-                 , epoch, target.BSTAR, target.MEAN_MOTION_DOT, target.MEAN_MOTION_DDOT, target.ECCENTRICITY, target.ARG_OF_PERICENTER, target.INCLINATION, target.MEAN_ANOMALY, target.MEAN_MOTION, target.RA_OF_ASC_NODE, &satrec)
+        let result = sgp4init(wgs84, opsMode, &tuple2
+                 , epoch, target.BSTAR, target.MEAN_MOTION_DOT/xpdotInv, target.MEAN_MOTION_DDOT/xpdotInv2, target.ECCENTRICITY*deg2rad, target.ARG_OF_PERICENTER*deg2rad, target.INCLINATION*deg2rad, target.MEAN_ANOMALY*deg2rad, target.MEAN_MOTION/xpdotp, target.RA_OF_ASC_NODE*deg2rad, &satrec)
         
         // Calculate the target states from epoch to secondsFromEpoch
         DispatchQueue.concurrentPerform(iterations: dCount, execute:  { i in
