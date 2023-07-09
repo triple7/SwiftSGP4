@@ -87,6 +87,7 @@ public class SwiftSGP4 {
         
 //        var tuple2 = (arr2[0], arr2[1], arr2[2], arr2[3], arr2[4], arr2[5])
         // Initialize sgp4 with the current parameters
+        print("target \(targets)")
         _ = sgp4init(wgs84, opsMode, &genSatNum
                  , epoch, target.BSTAR, target.MEAN_MOTION_DOT/xpdotInv, target.MEAN_MOTION_DDOT/xpdotInv2, target.ECCENTRICITY*deg2rad, target.ARG_OF_PERICENTER*deg2rad, target.INCLINATION*deg2rad, target.MEAN_ANOMALY*deg2rad, target.MEAN_MOTION/xpdotp, target.RA_OF_ASC_NODE*deg2rad, &satRecs[satrecIndex])
         
