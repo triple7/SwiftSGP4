@@ -133,7 +133,6 @@ public class SwiftSGP4 {
         var jdFrac:Double = 0.0
         
         jday(year, month, day, hour, minutes, seconds, &jd, &jdFrac)
-        print("jd \(jd) frac \(jdFrac)")
         let epoch = jd + jdFrac
 return epoch
     }
