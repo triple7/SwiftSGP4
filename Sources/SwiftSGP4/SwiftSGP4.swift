@@ -21,12 +21,12 @@ public class SwiftSGP4 {
     
     // improved algorithm
     private let opsMode:CChar = "i".cString(using: .utf8)![0]
-// last time propagation was calculated
-    private var lastDate:Date?
+// last minute since value time propagation was calculated
+    private var lastTSince:Double?
 
     public init(_ targets: [CelesTrakTarget]) {
         self.targets = targets
-        self.satRecs = [elsetrec]()
+        self.satRecs = [elsetrec](repeating: elsetrec(), count: targets.count)
         self.rad = 180.0/self.pi
         self.deg2rad = pi / 180.0
         self.xpdotp = 1440.0/(2.0*pi)
@@ -38,7 +38,6 @@ public class SwiftSGP4 {
 
     public func propagateOmms( _ secondsFromEpoch: Int, _ fps: Int, _ minDelta: Double = 1/60 /* seconds */)->[[SIMD3<Double>]] {
         let epoch = targets.first!.EPOCH
-        lastDate = dateString2Date(epoch)
         // Convert Jd
         let jdEpoch = timestampToJD(epoch)
 
@@ -54,7 +53,7 @@ public class SwiftSGP4 {
         let dCount = secondsFromEpoch*fps
             
         DispatchQueue.concurrentPerform(iterations: count, execute:  { i in
-            output[i] = computeITRF(targets[i], jdEpoch, delta, dCount, wgs84)
+            output[i] = computeITRF(i, targets[i], jdEpoch, delta, dCount, wgs84)
         })
 //        var distances = [Double]()
 //        for o in output {
@@ -68,9 +67,9 @@ public class SwiftSGP4 {
     }
     
     private let zeroSimd = SIMD3<Double>([0, 0, 0])
-    // Using generic number as we don't need satNum
+    // Using generic number as we don't need satNum for propagation
     private var genSatNum = (Int8(77), Int8(77), Int8(77), Int8(77), Int8(77), Int8(77))
-    public func computeITRF(_ target: CelesTrakTarget, _ epoch: Double, _ delta: Double, _ dCount
+    public func computeITRF(_ satrecIndex: Int, _ target: CelesTrakTarget, _ epoch: Double, _ delta: Double, _ dCount
                             : Int, _ grabConst:gravconsttype)->[SIMD3<Double>] {
         var output = [SIMD3<Double>](repeating: zeroSimd, count: dCount)
 
@@ -89,7 +88,7 @@ public class SwiftSGP4 {
 //        var tuple2 = (arr2[0], arr2[1], arr2[2], arr2[3], arr2[4], arr2[5])
         // Initialize sgp4 with the current parameters
         _ = sgp4init(wgs84, opsMode, &genSatNum
-                 , epoch, target.BSTAR, target.MEAN_MOTION_DOT/xpdotInv, target.MEAN_MOTION_DDOT/xpdotInv2, target.ECCENTRICITY*deg2rad, target.ARG_OF_PERICENTER*deg2rad, target.INCLINATION*deg2rad, target.MEAN_ANOMALY*deg2rad, target.MEAN_MOTION/xpdotp, target.RA_OF_ASC_NODE*deg2rad, &satrec)
+                 , epoch, target.BSTAR, target.MEAN_MOTION_DOT/xpdotInv, target.MEAN_MOTION_DDOT/xpdotInv2, target.ECCENTRICITY*deg2rad, target.ARG_OF_PERICENTER*deg2rad, target.INCLINATION*deg2rad, target.MEAN_ANOMALY*deg2rad, target.MEAN_MOTION/xpdotp, target.RA_OF_ASC_NODE*deg2rad, &satRecs[satrecIndex])
         
         // Calculate the target states from epoch to secondsFromEpoch
         DispatchQueue.concurrentPerform(iterations: dCount, execute:  { i in
