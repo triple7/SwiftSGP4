@@ -12,10 +12,11 @@ public class SwiftSGP4 {
     private let xpdotInv2:Double
     private let minPDay:Double
     private let secPDay:Double
+
     private var targets:[CelesTrakTarget]
     private var satRecs:[elsetrec]
-    private lazy var coordinates:[SIMD3<Double>] = {
-        return [SIMD3<Double>]()
+    private lazy var coordinates:[[SIMD3<Double>]] = {
+        return [[SIMD3<Double>]]()
     }()
     
     // improved algorithm
@@ -35,7 +36,7 @@ public class SwiftSGP4 {
         self.secPDay = 1440*60
     }
 
-    public func propagateOmms(_ targets: [CelesTrakTarget], _ secondsFromEpoch: Int, _ fps: Int, _ minDelta: Double = 1/60 /* seconds */)->[[SIMD3<Double>]] {
+    public func propagateOmms( _ secondsFromEpoch: Int, _ fps: Int, _ minDelta: Double = 1/60 /* seconds */)->[[SIMD3<Double>]] {
         let epoch = targets.first!.EPOCH
         lastDate = dateString2Date(epoch)
         // Convert Jd
@@ -67,6 +68,8 @@ public class SwiftSGP4 {
     }
     
     private let zeroSimd = SIMD3<Double>([0, 0, 0])
+    // Using generic number as we don't need satNum
+    private var genSatNum = (Int8(77), Int8(77), Int8(77), Int8(77), Int8(77), Int8(77))
     public func computeITRF(_ target: CelesTrakTarget, _ epoch: Double, _ delta: Double, _ dCount
                             : Int, _ grabConst:gravconsttype)->[SIMD3<Double>] {
         var output = [SIMD3<Double>](repeating: zeroSimd, count: dCount)
@@ -74,18 +77,18 @@ public class SwiftSGP4 {
         // struct to pass to sgp4 function
         var satrec = elsetrec()
         
-        // populate satrec
+        // no need to populate satrec
+        // But this is how properties are transformed
 //        satrec.classification = target.CLASSIFICATION_TYPE.cString(using: .utf8)![0]
 //        let arr = target.OBJECT_NAME.cString(using: .utf8)!
 //        satrec.ephtype = target.EPHEMERIS_TYPE.int32()
 //        satrec.elnum = target.ELEMENT_SET_NO
 //        satrec.revnum = target.REV_AT_EPOCH
-        let arr2 = target.OBJECT_ID.cString(using: .utf8)!
+//        let arr2 = target.OBJECT_ID.cString(using: .utf8)!
         
-        var tuple2 = (arr2[0], arr2[1], arr2[2], arr2[3], arr2[4], arr2[5])
-//        satrec.satnum = tuple2
+//        var tuple2 = (arr2[0], arr2[1], arr2[2], arr2[3], arr2[4], arr2[5])
         // Initialize sgp4 with the current parameters
-        _ = sgp4init(wgs84, opsMode, &tuple2
+        _ = sgp4init(wgs84, opsMode, &genSatNum
                  , epoch, target.BSTAR, target.MEAN_MOTION_DOT/xpdotInv, target.MEAN_MOTION_DDOT/xpdotInv2, target.ECCENTRICITY*deg2rad, target.ARG_OF_PERICENTER*deg2rad, target.INCLINATION*deg2rad, target.MEAN_ANOMALY*deg2rad, target.MEAN_MOTION/xpdotp, target.RA_OF_ASC_NODE*deg2rad, &satrec)
         
         // Calculate the target states from epoch to secondsFromEpoch
@@ -95,7 +98,6 @@ public class SwiftSGP4 {
             var vo = [Double](repeating: 0, count: 3)
 
             let lastSince = Double(i)*delta
-//            let epoch1 = epoch + lastSince
             sgp4(&satrec, lastSince, &ro, &vo)
             // transform from TEME to GTRF
             var RGtrf = [Double](repeating: 0, count: 3)
@@ -106,13 +108,6 @@ public class SwiftSGP4 {
             teme2ecefOptimised(&ro, epoch, gmstCos, gmstSin, &RGtrf)
             output[i] = SIMD3<Double>(RGtrf)
         })
-        if target.NORAD_CAT_ID == 25544 {
-            var distances = [Double]()
-            for o in output {
-                distances.append(sqrt(o.x*o.x + o.y*o.y + o.z*o.z))
-            }
-            print("ISS min: \(distances.min()!) \(distances.max()!)")
-        }
         return output
     }
 

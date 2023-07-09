@@ -1770,7 +1770,7 @@ double r[3], double v[3]
     mm = mm + satrec->no_unkozai * templ;
     xlm = mm + argpm + nodem;
     emsq = em * em;
-//    temp = 1.0 - emsq;
+    temp = 1.0 - emsq;
 
     nodem = fmod(nodem, twopi);
     argpm = fmod(argpm, twopi);
