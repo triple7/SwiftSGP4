@@ -16,11 +16,10 @@ public class SwiftSGP4 {
     public var targets:[CelesTrakTarget]
     private var satRecs:[elsetrec]
     public var coordinates:ContiguousArray<ContiguousArray<SIMD3<Double>>>
-    public var lastT:Double = 0
     // improved algorithm
     private let opsMode:CChar = "a".cString(using: .utf8)![0]
 // last minute since value time propagation was calculated
-    private var lastTSince:Double?
+    private var lastTSince:Double = 0
     // default second since last and fps
     private let secondsFromEpoch:Int = 1
     private let fps:Int = 30
@@ -56,7 +55,7 @@ public class SwiftSGP4 {
         let delta:Double = 1/Double(secondsFromEpoch*fps)
         let dCount = secondsFromEpoch*fps
         // save the last frame from epoch for the next cycle
-        lastT = Double(dCount)*delta
+        lastTSince = Double(dCount)*delta
 
             
         DispatchQueue.concurrentPerform(iterations: count, execute:  { i in
