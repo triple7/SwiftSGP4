@@ -55,6 +55,9 @@ public class SwiftSGP4 {
         // and count = seconds*fps
         let delta:Double = 1/Double(secondsFromEpoch*fps)
         let dCount = secondsFromEpoch*fps
+        // save the last frame from epoch for the next cycle
+        lastT = Double(dCount)*delta
+
             
         DispatchQueue.concurrentPerform(iterations: count, execute:  { i in
             coordinates[i] = computeITRF(i, targets[i], jdEpoch, delta, dCount, wgs72)
@@ -70,8 +73,6 @@ public class SwiftSGP4 {
 
         // struct to pass to sgp4 function
         var satrec = satRecs[satrecIndex]
-            // save the last frame from epoch for the next cycle
-            lastT = Double(dCount)*delta
             
         // no need to populate satrec
         // But this is how properties are transformed
