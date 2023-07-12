@@ -13,12 +13,10 @@ public class SwiftSGP4 {
     private let minPDay:Double
     private let secPDay:Double
 
-    private var targets:[CelesTrakTarget]
+    public var targets:[CelesTrakTarget]
     private var satRecs:[elsetrec]
-    private lazy var coordinates:[[SIMD3<Double>]] = {
-        return [[SIMD3<Double>]]()
-    }()
-    
+    public var coordinates:[[SIMD3<Double>]]
+    public var lastT:Double = 0
     // improved algorithm
     private let opsMode:CChar = "i".cString(using: .utf8)![0]
 // last minute since value time propagation was calculated
@@ -34,15 +32,16 @@ public class SwiftSGP4 {
         self.xpdotInv2 = self.xpdotp*1440*1440
         self.minPDay = 1440
         self.secPDay = 1440*60
+        self.coordinates = [[SIMD3<Double>]]()
     }
 
-    public func propagateOmms( _ secondsFromEpoch: Int, _ fps: Int, _ minDelta: Double = 1/60 /* seconds */)->[[SIMD3<Double>]] {
+    public func propagateOmms( _ secondsFromEpoch: Int, _ fps: Int, _ minDelta: Double = 1/60 /* seconds */) {
         let epoch = targets.first!.EPOCH
         // Convert Jd
         let jdEpoch = timestampToJD(epoch)
 
                                    let count = targets.count
-        var output = [[SIMD3<Double>]](repeating: [zeroSimd], count: targets.count)
+        coordinates = [[SIMD3<Double>]](repeating: [zeroSimd], count: targets.count)
         // time dimension parameters
         // We are propagating from
         // epoch to secondsFromEpoch by frames per second
@@ -53,17 +52,8 @@ public class SwiftSGP4 {
         let dCount = secondsFromEpoch*fps
             
         DispatchQueue.concurrentPerform(iterations: count, execute:  { i in
-            output[i] = computeITRF(i, targets[i], jdEpoch, delta, dCount, wgs84)
+            coordinates[i] = computeITRF(i, targets[i], jdEpoch, delta, dCount, wgs84)
         })
-        var distances = [Double]()
-        for o in output {
-            let v = o.first!
-            let distance = sqrt(v.x*v.x + v.y*v.y + v.z*v.z)
-            distances.append(distance)
-        }
-        print("Min distance \(distances.min()!)")
-        print("max distance: \(distances.max()!)")
-        return output
     }
     
     private let zeroSimd = SIMD3<Double>([0, 0, 0])
@@ -74,8 +64,10 @@ public class SwiftSGP4 {
         var output = [SIMD3<Double>](repeating: zeroSimd, count: dCount)
 
         // struct to pass to sgp4 function
-        var satrec = elsetrec()
-        
+        var satrec = satRecs[satrecIndex]
+            // save the last frame from epoch for the next cycle
+            lastT = Double(dCount)*delta
+            
         // no need to populate satrec
         // But this is how properties are transformed
 //        satrec.classification = target.CLASSIFICATION_TYPE.cString(using: .utf8)![0]
