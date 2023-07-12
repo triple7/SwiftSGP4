@@ -99,7 +99,7 @@ public class SwiftSGP4 {
             teme2ecefOptimised(&ro, epoch, gmstCos, gmstSin, &RGtrf)
             output[i] = SIMD3<Double>(RGtrf)
         })
-        print(satrec)
+        satRecs[satrecIndex] = satrec
         print(satRecs[satrecIndex])
         return output
     }
