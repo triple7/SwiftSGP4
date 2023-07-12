@@ -59,7 +59,7 @@ public class SwiftSGP4 {
 
             
         DispatchQueue.concurrentPerform(iterations: count, execute:  { i in
-            coordinates[i] = computeITRF(i, targets[i], jdEpoch, delta, dCount, wgs72)
+            computeITRF(i, targets[i], jdEpoch, delta, dCount, wgs72)
         })
     }
     
@@ -67,8 +67,7 @@ public class SwiftSGP4 {
     // Using generic number as we don't need satNum for propagation
     private var genSatNum = (Int8(77), Int8(77), Int8(77), Int8(77), Int8(77), Int8(77))
     public func computeITRF(_ satrecIndex: Int, _ target: CelesTrakTarget, _ epoch: Double, _ delta: Double, _ dCount
-                            : Int, _ grabConst:gravconsttype)->ContiguousArray<SIMD3<Double>> {
-        var output = ContiguousArray<SIMD3<Double>>(repeating: zeroSimd, count: dCount)
+                            : Int, _ grabConst:gravconsttype) {
 
         // struct to pass to sgp4 function
         var satrec = satRecs[satrecIndex]
@@ -102,10 +101,9 @@ public class SwiftSGP4 {
             let gmstSin = sin(gmst)
 
             teme2ecefOptimised(&ro, epoch, gmstCos, gmstSin, &RGtrf)
-            output[i] = SIMD3<Double>(RGtrf)
+            self.coordinates[satrecIndex][i] = SIMD3<Double>(RGtrf)
         })
         satRecs[satrecIndex] = satrec
-        return output
     }
 
     private func dateString2Date( _ dateString: String)->Date {
