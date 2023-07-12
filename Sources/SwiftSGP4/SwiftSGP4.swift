@@ -24,9 +24,15 @@ public class SwiftSGP4 {
     private let secondsFromEpoch:Int = 1
     private let fps:Int = 30
 
+    private let targetCount:Int
+    private let epoch:String
+    private let jdEpoch:Double
+
+    
     public init(_ targets: [CelesTrakTarget]) {
+        
         self.targets = targets
-        self.satRecs = [elsetrec](repeating: elsetrec(), count: targets.count)
+        self.targetCount = targets.count
         self.rad = 180.0/self.pi
         self.deg2rad = pi / 180.0
         self.xpdotp = 1440.0/(2.0*pi)
@@ -35,16 +41,42 @@ public class SwiftSGP4 {
         self.minPDay = 1440
         self.secPDay = 1440*60
 
+ epoch = targets.first!.EPOCH
+        let dateFormat = DateFormatter()
+        dateFormat.timeZone = TimeZone(abbreviation: "UTC")
+        dateFormat.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
+        let date = dateFormat.date(from: epoch)!
+
+        let calendar = Calendar.current
+        let  components  =  calendar.dateComponents([.year, .month, .day, .hour, .minute, .second],  from:  date)
+        let year = components.year!.int32()
+        let month = components.month!.int32()
+        let day = components.day!.int32()
+        let hour = components.hour!.int32()
+        let minutes = components.minute!.int32()
+         let seconds = Double(components.second!)
+        var jd:Double = 0.0
+        var jdFrac:Double = 0.0
         
+        jday(year, month, day, hour, minutes, seconds, &jd, &jdFrac)
+        jdEpoch = jd + jdFrac
+
+
+        self.satRecs = [elsetrec]()
+        for target in targets {
+            var satrec = elsetrec()
+            _ = sgp4init(wgs72, opsMode, &genSatNum
+                     , jdEpoch, target.BSTAR, target.MEAN_MOTION_DOT/xpdotInv, target.MEAN_MOTION_DDOT/xpdotInv2, target.ECCENTRICITY*deg2rad, target.ARG_OF_PERICENTER*deg2rad, target.INCLINATION*deg2rad, target.MEAN_ANOMALY*deg2rad, target.MEAN_MOTION/xpdotp, target.RA_OF_ASC_NODE*deg2rad, &satrec)
+            
+            satRecs.append(satrec)
+        }
+
         let targetFrames = ContiguousArray<SIMD3<Double>>(repeating: zeroSimd, count: secondsFromEpoch*fps)
-        self.coordinates = ContiguousArray<ContiguousArray<SIMD3<Double>>>(repeating: targetFrames, count: targets.count)
+        self.coordinates = ContiguousArray<ContiguousArray<SIMD3<Double>>>(repeating: targetFrames, count: targetCount)
     }
 
     public func propagateOmms( _ minDelta: Double = 1/60 /* seconds */) {
-        let epoch = targets.first!.EPOCH
-        // Convert Jd
-        let jdEpoch = timestampToJD(epoch)
-
+        
                                    let count = targets.count
         // time dimension parameters
         // We are propagating from
@@ -59,33 +91,19 @@ public class SwiftSGP4 {
 
             
         DispatchQueue.concurrentPerform(iterations: count, execute:  { i in
-            computeITRF(i, targets[i], jdEpoch, delta, dCount, wgs72)
+            computeITRF(i, jdEpoch, delta, dCount)
         })
     }
     
     private let zeroSimd = SIMD3<Double>([0, 0, 0])
     // Using generic number as we don't need satNum for propagation
     private var genSatNum = (Int8(77), Int8(77), Int8(77), Int8(77), Int8(77), Int8(77))
-    public func computeITRF(_ satrecIndex: Int, _ target: CelesTrakTarget, _ epoch: Double, _ delta: Double, _ dCount
-                            : Int, _ grabConst:gravconsttype) {
+    public func computeITRF(_ satrecIndex: Int, _ epoch: Double, _ delta: Double, _ dCount
+                            : Int) {
 
         // struct to pass to sgp4 function
         var satrec = satRecs[satrecIndex]
             
-        // no need to populate satrec
-        // But this is how properties are transformed
-//        satrec.classification = target.CLASSIFICATION_TYPE.cString(using: .utf8)![0]
-//        let arr = target.OBJECT_NAME.cString(using: .utf8)!
-//        satrec.ephtype = target.EPHEMERIS_TYPE.int32()
-//        satrec.elnum = target.ELEMENT_SET_NO
-//        satrec.revnum = target.REV_AT_EPOCH
-//        let arr2 = target.OBJECT_ID.cString(using: .utf8)!
-        
-//        var tuple2 = (arr2[0], arr2[1], arr2[2], arr2[3], arr2[4], arr2[5])
-        // Initialize sgp4 with the current parameters
-        _ = sgp4init(grabConst, opsMode, &genSatNum
-                 , epoch, target.BSTAR, target.MEAN_MOTION_DOT/xpdotInv, target.MEAN_MOTION_DDOT/xpdotInv2, target.ECCENTRICITY*deg2rad, target.ARG_OF_PERICENTER*deg2rad, target.INCLINATION*deg2rad, target.MEAN_ANOMALY*deg2rad, target.MEAN_MOTION/xpdotp, target.RA_OF_ASC_NODE*deg2rad, &satrec)
-        
         // Calculate the target states from epoch to secondsFromEpoch
         DispatchQueue.concurrentPerform(iterations: dCount, execute:  { i in
             // orbital set
@@ -103,7 +121,6 @@ public class SwiftSGP4 {
             teme2ecefOptimised(&ro, epoch, gmstCos, gmstSin, &RGtrf)
             self.coordinates[satrecIndex][i] = SIMD3<Double>(RGtrf)
         })
-        satRecs[satrecIndex] = satrec
     }
 
     private func dateString2Date( _ dateString: String)->Date {
