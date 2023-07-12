@@ -41,7 +41,7 @@ public class SwiftSGP4 {
         let jdEpoch = timestampToJD(epoch)
 
                                    let count = targets.count
-        coordinates = [[SIMD3<Double>]](repeating: [zeroSimd], count: targets.count)
+        coordinates = [[SIMD3<Double>]](repeating: [zeroSimd], count: count)
         // time dimension parameters
         // We are propagating from
         // epoch to secondsFromEpoch by frames per second
@@ -52,7 +52,7 @@ public class SwiftSGP4 {
         let dCount = secondsFromEpoch*fps
             
         DispatchQueue.concurrentPerform(iterations: count, execute:  { i in
-            coordinates[i] = computeITRF(i, targets[i], jdEpoch, delta, dCount, wgs84)
+            coordinates[i] = computeITRF(i, targets[i], jdEpoch, delta, dCount, wgs72)
         })
     }
     
@@ -79,7 +79,7 @@ public class SwiftSGP4 {
         
 //        var tuple2 = (arr2[0], arr2[1], arr2[2], arr2[3], arr2[4], arr2[5])
         // Initialize sgp4 with the current parameters
-        _ = sgp4init(wgs72, opsMode, &genSatNum
+        _ = sgp4init(grabConst, opsMode, &genSatNum
                  , epoch, target.BSTAR, target.MEAN_MOTION_DOT/xpdotInv, target.MEAN_MOTION_DDOT/xpdotInv2, target.ECCENTRICITY*deg2rad, target.ARG_OF_PERICENTER*deg2rad, target.INCLINATION*deg2rad, target.MEAN_ANOMALY*deg2rad, target.MEAN_MOTION/xpdotp, target.RA_OF_ASC_NODE*deg2rad, &satrec)
         
         // Calculate the target states from epoch to secondsFromEpoch
@@ -99,6 +99,7 @@ public class SwiftSGP4 {
             teme2ecefOptimised(&ro, epoch, gmstCos, gmstSin, &RGtrf)
             output[i] = SIMD3<Double>(RGtrf)
         })
+        print(satrec)
         return output
     }
 
