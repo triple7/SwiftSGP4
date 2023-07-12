@@ -100,6 +100,7 @@ public class SwiftSGP4 {
             output[i] = SIMD3<Double>(RGtrf)
         })
         print(satrec)
+        print(satRecs[satrecIndex])
         return output
     }
 
