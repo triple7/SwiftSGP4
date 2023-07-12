@@ -15,12 +15,15 @@ public class SwiftSGP4 {
 
     public var targets:[CelesTrakTarget]
     private var satRecs:[elsetrec]
-    public var coordinates:[[SIMD3<Double>]]
+    public var coordinates:ContiguousArray<ContiguousArray<SIMD3<Double>>>
     public var lastT:Double = 0
     // improved algorithm
-    private let opsMode:CChar = "i".cString(using: .utf8)![0]
+    private let opsMode:CChar = "a".cString(using: .utf8)![0]
 // last minute since value time propagation was calculated
     private var lastTSince:Double?
+    // default second since last and fps
+    private let secondsFromEpoch:Int = 1
+    private let fps:Int = 30
 
     public init(_ targets: [CelesTrakTarget]) {
         self.targets = targets
@@ -32,16 +35,18 @@ public class SwiftSGP4 {
         self.xpdotInv2 = self.xpdotp*1440*1440
         self.minPDay = 1440
         self.secPDay = 1440*60
-        self.coordinates = [[SIMD3<Double>]]()
+
+        
+        let targetFrames = ContiguousArray<SIMD3<Double>>(repeating: zeroSimd, count: secondsFromEpoch*fps)
+        self.coordinates = ContiguousArray<ContiguousArray<SIMD3<Double>>>(repeating: targetFrames, count: targets.count)
     }
 
-    public func propagateOmms( _ secondsFromEpoch: Int, _ fps: Int, _ minDelta: Double = 1/60 /* seconds */) {
+    public func propagateOmms( _ minDelta: Double = 1/60 /* seconds */) {
         let epoch = targets.first!.EPOCH
         // Convert Jd
         let jdEpoch = timestampToJD(epoch)
 
                                    let count = targets.count
-        coordinates = [[SIMD3<Double>]](repeating: [zeroSimd], count: count)
         // time dimension parameters
         // We are propagating from
         // epoch to secondsFromEpoch by frames per second
@@ -60,8 +65,8 @@ public class SwiftSGP4 {
     // Using generic number as we don't need satNum for propagation
     private var genSatNum = (Int8(77), Int8(77), Int8(77), Int8(77), Int8(77), Int8(77))
     public func computeITRF(_ satrecIndex: Int, _ target: CelesTrakTarget, _ epoch: Double, _ delta: Double, _ dCount
-                            : Int, _ grabConst:gravconsttype)->[SIMD3<Double>] {
-        var output = [SIMD3<Double>](repeating: zeroSimd, count: dCount)
+                            : Int, _ grabConst:gravconsttype)->ContiguousArray<SIMD3<Double>> {
+        var output = ContiguousArray<SIMD3<Double>>(repeating: zeroSimd, count: dCount)
 
         // struct to pass to sgp4 function
         var satrec = satRecs[satrecIndex]
@@ -100,7 +105,6 @@ public class SwiftSGP4 {
             output[i] = SIMD3<Double>(RGtrf)
         })
         satRecs[satrecIndex] = satrec
-        print(satRecs[satrecIndex])
         return output
     }
 
