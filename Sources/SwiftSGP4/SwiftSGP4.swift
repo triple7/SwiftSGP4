@@ -122,7 +122,7 @@ public class SwiftSGP4 {
             self.coordinates[satrecIndex][i] = SIMD3<Double>(RGtrf)
         })
         if targets[satrecIndex].NORAD_CAT_ID == 25544 {
-            print("ISS z: \(self.coordinates[satrecIndex][0].z)")
+            print("ISS z: \(self.coordinates[satrecIndex][0])")
         }
     }
 
