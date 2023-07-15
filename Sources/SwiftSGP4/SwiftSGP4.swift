@@ -17,7 +17,7 @@ public class SwiftSGP4 {
     private var satRecs:[elsetrec]
     public var coordinates:ContiguousArray<ContiguousArray<SIMD3<Double>>>
     // improved algorithm
-    private let opsMode:CChar = "i".cString(using: .utf8)![0]
+    private let opsMode:CChar = "a".cString(using: .utf8)![0]
 // last minute since value time propagation was calculated
     private var lastTSince:Double = 0
     // default second since last and fps
@@ -35,11 +35,11 @@ public class SwiftSGP4 {
         self.targetCount = targets.count
         self.rad = 180.0/self.pi
         self.deg2rad = pi / 180.0
-        self.xpdotp = 1440.0/(2.0*pi)
-        self.xpdotInv = self.xpdotp*1440
-        self.xpdotInv2 = self.xpdotp*1440*1440
         self.minPDay = 1440
         self.secPDay = 1440*60
+        self.xpdotp = self.minPDay/(2.0*pi)
+        self.xpdotInv = self.xpdotp*self.minPDay
+        self.xpdotInv2 = self.xpdotp*self.minPDay*self.minPDay
 
  epoch = targets.first!.EPOCH
         let dateFormat = DateFormatter()
@@ -60,7 +60,6 @@ public class SwiftSGP4 {
         
         jday(year, month, day, hour, minutes, seconds, &jd, &jdFrac)
         jdEpoch = jd + jdFrac
-
 
         self.satRecs = [elsetrec]()
         for target in targets {
