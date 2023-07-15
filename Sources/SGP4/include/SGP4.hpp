@@ -101,8 +101,8 @@ _ = sgp4init(wgs72,
              &genSatNum,
              jdEpoch,
              target.BSTAR,
-             target.MEAN_MOTION_DOT/xpdotInv,
-             target.MEAN_MOTION_DDOT/xpdotInv2,
+             target.MEAN_MOTION_DOT/xpdotInv, // looks correct
+             target.MEAN_MOTION_DDOT/xpdotInv2, // looks correct
              target.ECCENTRICITY*deg2rad,
              target.ARG_OF_PERICENTER*deg2rad,
              target.INCLINATION*deg2rad,
