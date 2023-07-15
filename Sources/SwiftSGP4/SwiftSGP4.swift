@@ -65,29 +65,28 @@ public class SwiftSGP4 {
         print("Btar: \(targets[0].BSTAR)")
 
         self.satRecs = [elsetrec]()
+        var target = targets.first!
+        print("jd \(jd)")
+        print(" jdfrac: \(jdFrac)")
+        print("bstar \(target.BSTAR)")
+        print("mean motion dot\(target.MEAN_MOTION_DOT/xpdotInv)")
+        print("mean motion ddot\(target.MEAN_MOTION_DDOT/xpdotInv2)")
+        print("eccentricity\(target.ECCENTRICITY)")
+        print("argument of pericenter\(target.ARG_OF_PERICENTER*deg2rad)")
+        print("Inclination \(target.INCLINATION*deg2rad)")
+        print("mean anomaly \(target.MEAN_ANOMALY*deg2rad)")
+        print("mean motion\(target.MEAN_MOTION/xpdotp)")
+        print("rra of node\(target.RA_OF_ASC_NODE*deg2rad)")
+
         for target in targets {
             var satrec = elsetrec()
             satrec.elnum = target.ELEMENT_SET_NO
             satrec.revnum = target.REV_AT_EPOCH
             satrec.classification = target.CLASSIFICATION_TYPE.cString(using: .unicode)![0]
             
-            satrec.jdsatepoch = jd
-            satrec.jdsatepochF = jdFrac
-            satrec.bstar = target.BSTAR
-                    satrec.ndot = target.MEAN_MOTION_DOT/xpdotInv
-            satrec.nddot = target.MEAN_MOTION_DDOT/xpdotInv2
-            satrec.ecco = target.ECCENTRICITY
-            satrec.argpo = target.ARG_OF_PERICENTER*deg2rad
-            satrec.inclo = target.INCLINATION*deg2rad
-            satrec.mo = target.MEAN_ANOMALY*deg2rad
-            satrec.no_kozai = target.MEAN_MOTION/xpdotp
-            satrec.nodeo = target.RA_OF_ASC_NODE*deg2rad
             _ = sgp4init(wgs72, opsMode, &genSatNum
-                         , jdEpoch - jd1950, satrec.bstar, target.MEAN_MOTION_DOT/xpdotInv, target.MEAN_MOTION_DDOT/xpdotInv2, target.ECCENTRICITY, target.ARG_OF_PERICENTER*deg2rad, target.INCLINATION*deg2rad, target.MEAN_ANOMALY*deg2rad,
+                         , jdEpoch - jd1950, target.BSTAR, target.MEAN_MOTION_DOT/xpdotInv, target.MEAN_MOTION_DDOT/xpdotInv2, target.ECCENTRICITY, target.ARG_OF_PERICENTER*deg2rad, target.INCLINATION*deg2rad, target.MEAN_ANOMALY*deg2rad,
                          target.MEAN_MOTION/xpdotp, target.RA_OF_ASC_NODE*deg2rad, &satrec)
-            
-            
-            
 
             
             satRecs.append(satrec)
