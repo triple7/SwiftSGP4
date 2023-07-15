@@ -121,9 +121,9 @@ public class SwiftSGP4 {
             teme2ecefOptimised(&ro, epoch, gmstCos, gmstSin, &RGtrf)
             self.coordinates[satrecIndex][i] = SIMD3<Double>(RGtrf)
         })
-        if targets[satrecIndex].NORAD_CAT_ID == 25544 {
-            print("ISS z: \(self.coordinates[satrecIndex][0])")
-        }
+//        if targets[satrecIndex].NORAD_CAT_ID == 25544 {
+//            print("ISS z: \(self.coordinates[satrecIndex][0])")
+//        }
     }
 
     private func dateString2Date( _ dateString: String)->Date {
