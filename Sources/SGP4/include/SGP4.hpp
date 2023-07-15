@@ -66,7 +66,57 @@ typedef struct elsetrec
   double rcs_m2; // "RCS (m^2)" storage  
 } elsetrec;
 
-bool sgp4init(gravconsttype whichconst, char opsmode, const char satn[9], const double epoch, const double xbstar, const double xndot, const double xnddot, const double xecco, const double xargpo, const double xinclo, const double xmo, const double xno_kozai, const double xnodeo, elsetrec* satrec);
+bool sgp4init(gravconsttype whichconst,//*    whichconst  - which set of constants to use  72, 84
+              char opsmode, //*    opsmode     - mode of operation afspc or improved 'a', 'i'
+              const char satn[9], //*    satn        - satellite number
+              const double epoch, //*    epoch       - epoch time in days from jan 0, 1950. 0 hr
+              const double xbstar, //*    bstar       - sgp4 type drag coefficient              kg/m2er
+              const double xndot, // NO IDEA
+              const double xnddot,  // NO IDEA
+              const double xecco, //*    ecco        - eccentricity
+              const double xargpo, //*    argpo       - argument of perigee (output if ds)
+              const double xinclo, //*    inclo       - inclination
+              const double xmo, //*    mo          - mean anomaly (output if ds)
+              const double xno_kozai, //*    no          - mean motion
+              const double xnodeo, //*    nodeo       - right ascension of ascending node
+              elsetrec* satrec);
+
+/*
+ satrec.no_kozai = satrec.no_kozai / xpdotp; // rad/min
+ satrec.ndot = satrec.ndot / (xpdotp*1440.0);  // ? * minperday
+ satrec.nddot = satrec.nddot / (xpdotp*1440.0 * 1440);
+ satrec.inclo = satrec.inclo  * deg2rad;
+ satrec.nodeo = satrec.nodeo  * deg2rad;
+ satrec.argpo = satrec.argpo  * deg2rad;
+ satrec.mo = satrec.mo     * deg2rad;
+
+
+satrec.ndot = satrec.ndot / (xpdotp*1440.0);  // ? * minperday
+satrec.nddot = satrec.nddot / (xpdotp*1440.0 * 1440);
+
+
+
+_ = sgp4init(wgs72,
+             opsMode,
+             &genSatNum,
+             jdEpoch,
+             target.BSTAR,
+             target.MEAN_MOTION_DOT/xpdotInv,
+             target.MEAN_MOTION_DDOT/xpdotInv2,
+             target.ECCENTRICITY*deg2rad,
+             target.ARG_OF_PERICENTER*deg2rad,
+             target.INCLINATION*deg2rad,
+             target.MEAN_MOTION*deg2rad,
+             target.MEAN_ANOMALY/xpdotp,
+             target.RA_OF_ASC_NODE*deg2rad,
+             &satrec)
+
+
+*/
+
+
+
+
 
 bool sgp4(elsetrec* satrec, double tsince,double r[3], double v[3]);
 
