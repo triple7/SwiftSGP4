@@ -106,8 +106,8 @@ _ = sgp4init(wgs72,
              target.ECCENTRICITY*deg2rad,
              target.ARG_OF_PERICENTER*deg2rad,
              target.INCLINATION*deg2rad,
-             target.MEAN_MOTION*deg2rad,
-             target.MEAN_ANOMALY/xpdotp,
+             target.MEAN_ANOMALY*deg2rad,
+             target.MEAN_MOTION/xpdotp,
              target.RA_OF_ASC_NODE*deg2rad,
              &satrec)
 
