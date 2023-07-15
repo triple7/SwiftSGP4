@@ -17,7 +17,7 @@ public class SwiftSGP4 {
     private var satRecs:[elsetrec]
     public var coordinates:ContiguousArray<ContiguousArray<SIMD3<Double>>>
     // improved algorithm
-    private let opsMode:CChar = "a".cString(using: .utf8)![0]
+    private let opsMode:CChar = "i".cString(using: .utf8)![0]
 // last minute since value time propagation was calculated
     private var lastTSince:Double = 0
     // default second since last and fps
@@ -65,6 +65,9 @@ public class SwiftSGP4 {
         self.satRecs = [elsetrec]()
         for target in targets {
             var satrec = elsetrec()
+            satrec.elnum = target.ELEMENT_SET_NO
+            satrec.revnum = target.REV_AT_EPOCH
+            
             _ = sgp4init(wgs72, opsMode, &genSatNum
                      , jdEpoch, target.BSTAR, target.MEAN_MOTION_DOT/xpdotInv, target.MEAN_MOTION_DDOT/xpdotInv2, target.ECCENTRICITY*deg2rad, target.ARG_OF_PERICENTER*deg2rad, target.INCLINATION*deg2rad, target.MEAN_ANOMALY*deg2rad, target.MEAN_MOTION/xpdotp, target.RA_OF_ASC_NODE*deg2rad, &satrec)
             
