@@ -5,6 +5,7 @@ import Foundation
 
 public class SwiftSGP4 {
     private let pi:Double = 3.14159265358979323846
+    private let jd1950:Double = 2433281.5
     private let rad:Double
     private let deg2rad:Double
     private let xpdotp:Double
@@ -60,7 +61,8 @@ public class SwiftSGP4 {
         
         jday(year, month, day, hour, minutes, seconds, &jd, &jdFrac)
         jdEpoch = jd + jdFrac
-        print("Jd epoich: \(jdEpoch)")
+        print("JD epoch: \(jdEpoch)")
+        print("Btar: \(targets[0].BSTAR)")
 
         self.satRecs = [elsetrec]()
         for target in targets {
@@ -69,8 +71,10 @@ public class SwiftSGP4 {
             satrec.revnum = target.REV_AT_EPOCH
             satrec.classification = target.CLASSIFICATION_TYPE.cString(using: .unicode)![0]
             
+            satrec.jdsatepoch = jd
+            satrec.jdsatepochF = jdFrac
             _ = sgp4init(wgs72, opsMode, &genSatNum
-                     , jdEpoch, target.BSTAR, target.MEAN_MOTION_DOT/xpdotInv, target.MEAN_MOTION_DDOT/xpdotInv2, target.ECCENTRICITY, target.ARG_OF_PERICENTER*deg2rad, target.INCLINATION*deg2rad, target.MEAN_ANOMALY*deg2rad,
+                     , jdEpoch - jd1950, target.BSTAR, target.MEAN_MOTION_DOT/xpdotInv, target.MEAN_MOTION_DDOT/xpdotInv2, target.ECCENTRICITY, target.ARG_OF_PERICENTER*deg2rad, target.INCLINATION*deg2rad, target.MEAN_ANOMALY*deg2rad,
                          target.MEAN_MOTION/xpdotp, target.RA_OF_ASC_NODE*deg2rad, &satrec)
             
             
