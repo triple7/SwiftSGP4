@@ -70,7 +70,11 @@ public class SwiftSGP4 {
             satrec.classification = target.CLASSIFICATION_TYPE.cString(using: .unicode)![0]
             
             _ = sgp4init(wgs72, opsMode, &genSatNum
-                     , jdEpoch, target.BSTAR, target.MEAN_MOTION_DOT/xpdotInv, target.MEAN_MOTION_DDOT/xpdotInv2, target.ECCENTRICITY*deg2rad, target.ARG_OF_PERICENTER*deg2rad, target.INCLINATION*deg2rad, target.MEAN_ANOMALY*deg2rad, target.MEAN_MOTION/deg2rad, target.RA_OF_ASC_NODE*deg2rad, &satrec)
+                     , jdEpoch, target.BSTAR, target.MEAN_MOTION_DOT/xpdotInv, target.MEAN_MOTION_DDOT/xpdotInv2, target.ECCENTRICITY*deg2rad, target.ARG_OF_PERICENTER*deg2rad, target.INCLINATION*deg2rad, target.MEAN_MOTION*deg2rad, target.MEAN_ANOMALY/xpdotp, target.RA_OF_ASC_NODE*deg2rad, &satrec)
+            
+            
+            
+
             
             satRecs.append(satrec)
         }
