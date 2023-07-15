@@ -60,6 +60,7 @@ public class SwiftSGP4 {
         
         jday(year, month, day, hour, minutes, seconds, &jd, &jdFrac)
         jdEpoch = jd + jdFrac
+        print("Jd epoich: \(jdEpoch)")
 
         self.satRecs = [elsetrec]()
         for target in targets {
