@@ -103,7 +103,7 @@ _ = sgp4init(wgs72,
              target.BSTAR,
              target.MEAN_MOTION_DOT/xpdotInv, // looks correct
              target.MEAN_MOTION_DDOT/xpdotInv2, // looks correct
-             target.ECCENTRICITY*deg2rad,
+             target.ECCENTRICITY, // Change to without degrees 2 rad.
              target.ARG_OF_PERICENTER*deg2rad,
              target.INCLINATION*deg2rad,
              target.MEAN_ANOMALY*deg2rad,
