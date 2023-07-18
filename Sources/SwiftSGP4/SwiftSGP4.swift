@@ -61,29 +61,27 @@ public class SwiftSGP4 {
         
         jday(year, month, day, hour, minutes, seconds, &jd, &jdFrac)
         jdEpoch = jd + jdFrac
-        print("JD epoch: \(jdEpoch)")
-        print("Btar: \(targets[0].BSTAR)")
 
         self.satRecs = [elsetrec]()
-        var target = targets.first!
-        print("jd \(jd)")
-        print(" jdfrac: \(jdFrac)")
-        print("bstar \(target.BSTAR)")
-        print("mean motion dot\(target.MEAN_MOTION_DOT)")
-        print("mean motion ddot\(target.MEAN_MOTION_DDOT)")
-        print("eccentricity\(target.ECCENTRICITY)")
-        print("argument of pericenter\(target.ARG_OF_PERICENTER)")
-        print("Inclination \(target.INCLINATION)")
-        print("mean anomaly \(target.MEAN_ANOMALY)")
-        print("mean motion\(target.MEAN_MOTION)")
-        print("rra of node\(target.RA_OF_ASC_NODE)")
+//        var target = targets.first!
+//        print("jd \(jd)")
+//        print(" jdfrac: \(jdFrac)")
+//        print("bstar \(target.BSTAR)")
+//        print("mean motion dot\(target.MEAN_MOTION_DOT)")
+//        print("mean motion ddot\(target.MEAN_MOTION_DDOT)")
+//        print("eccentricity\(target.ECCENTRICITY)")
+//        print("argument of pericenter\(target.ARG_OF_PERICENTER)")
+//        print("Inclination \(target.INCLINATION)")
+//        print("mean anomaly \(target.MEAN_ANOMALY)")
+//        print("mean motion\(target.MEAN_MOTION)")
+//        print("rra of node\(target.RA_OF_ASC_NODE)")
 
         for target in targets {
             var satrec = elsetrec()
             satrec.elnum = target.ELEMENT_SET_NO
             satrec.revnum = target.REV_AT_EPOCH
             satrec.classification = target.CLASSIFICATION_TYPE.cString(using: .unicode)![0]
-            
+            satrec.ephtype = 0
             _ = sgp4init(wgs72, opsMode, &genSatNum
                          , jdEpoch - jd1950, target.BSTAR, target.MEAN_MOTION_DOT/xpdotInv, target.MEAN_MOTION_DDOT/xpdotInv2, target.ECCENTRICITY, target.ARG_OF_PERICENTER*deg2rad, target.INCLINATION*deg2rad, target.MEAN_ANOMALY*deg2rad,
                          target.MEAN_MOTION/xpdotp, target.RA_OF_ASC_NODE*deg2rad, &satrec)
@@ -105,7 +103,7 @@ public class SwiftSGP4 {
         // such that:
         // delta = (1/(60*fps)
         // and count = seconds*fps
-        let delta:Double = 1/Double(secondsFromEpoch*fps)
+        let delta:Double = 1/Double(secondsFromEpoch*60*fps)
         let dCount = secondsFromEpoch*fps
         // save the last frame from epoch for the next cycle
         lastTSince = Double(dCount)*delta
@@ -133,6 +131,9 @@ public class SwiftSGP4 {
 
             let lastSince = Double(i)*delta
             sgp4(&satrec, lastSince, &ro, &vo)
+            if satrec.error != 0 {
+                print("error \(satrec.error)")
+            }
             // transform from TEME to GTRF
             var RGtrf = [Double](repeating: 0, count: 3)
             let gmst = gstime(jdut1: epoch)
