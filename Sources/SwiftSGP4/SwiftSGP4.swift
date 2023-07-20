@@ -84,7 +84,7 @@ public class SwiftSGP4 {
             satrec.ephtype = 0
             _ = sgp4init(wgs72, opsMode, &genSatNum
                          , jdEpoch - jd1950, target.BSTAR, target.MEAN_MOTION_DOT/xpdotInv, target.MEAN_MOTION_DDOT/xpdotInv2, target.ECCENTRICITY, target.ARG_OF_PERICENTER*deg2rad, target.INCLINATION*deg2rad, target.MEAN_ANOMALY*deg2rad,
-                         target.MEAN_MOTION/xpdotp, target.RA_OF_ASC_NODE, &satrec)
+                         target.MEAN_MOTION/xpdotp, target.RA_OF_ASC_NODE*deg2rad, &satrec)
 
             
             satRecs.append(satrec)
@@ -131,9 +131,6 @@ public class SwiftSGP4 {
 
             let lastSince = Double(i)*delta
             sgp4(&satrec, lastSince, &ro, &vo)
-            if satrec.error != 0 {
-                print("error \(satrec.error)")
-            }
             // transform from TEME to GTRF
             var RGtrf = [Double](repeating: 0, count: 3)
             let gmst = gstime(jdut1: epoch)
