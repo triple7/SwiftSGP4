@@ -63,7 +63,7 @@ public class SwiftSGP4 {
         jdEpoch = jd + jdFrac
 
         self.satRecs = [elsetrec]()
-//        var target = targets.first!
+        var target = targets.first!
 //        print("jd \(jd)")
 //        print(" jdfrac: \(jdFrac)")
 //        print("bstar \(target.BSTAR)")
