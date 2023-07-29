@@ -69,7 +69,7 @@ public class SwiftSGP4 {
 //        print("bstar \(target.BSTAR)")
 //        print("mean motion dot\(target.MEAN_MOTION_DOT)")
 //        print("mean motion ddot\(target.MEAN_MOTION_DDOT)")
-        print("eccentricity\(target.ECCENTRICITY)")
+//        print("eccentricity\(target.ECCENTRICITY)")
 //        print("argument of pericenter\(target.ARG_OF_PERICENTER)")
 //        print("Inclination \(target.INCLINATION)")
 //        print("mean anomaly \(target.MEAN_ANOMALY)")
