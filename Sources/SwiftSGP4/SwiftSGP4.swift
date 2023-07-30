@@ -25,8 +25,8 @@ public class SwiftSGP4 {
     private let secondsFromEpoch:Int = 1
     private let fps:Int = 30
 
-    private let targetCount:Int
-    private let epoch:String
+     let targetCount:Int
+    internal let epoch:Date
     private let jdEpoch:Double
 
     
@@ -42,26 +42,8 @@ public class SwiftSGP4 {
         self.xpdotInv = self.xpdotp*self.minPDay
         self.xpdotInv2 = self.xpdotp*self.minPDay*self.minPDay
 
- epoch = targets.first!.EPOCH
-        let dateFormat = DateFormatter()
-        dateFormat.timeZone = TimeZone(abbreviation: "UTC")
-        dateFormat.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
-        let date = dateFormat.date(from: epoch)!
-
-        let calendar = Calendar.current
-        let  components  =  calendar.dateComponents([.year, .month, .day, .hour, .minute, .second],  from:  date)
-        let year = components.year!.int32()
-        let month = components.month!.int32()
-        let day = components.day!.int32()
-        let hour = components.hour!.int32()
-        let minutes = components.minute!.int32()
-         let seconds = Double(components.second!)
-        var jd:Double = 0.0
-        var jdFrac:Double = 0.0
-        
-        jday(year, month, day, hour, minutes, seconds, &jd, &jdFrac)
-        jdEpoch = jd + jdFrac
-
+ epoch = dateString2Date(targets.first!.EPOCH)
+jdEpoch = timestampToJD(epoch)
         self.satRecs = [elsetrec]()
         var target = targets.first!
 //        print("jd \(jd)")
@@ -143,32 +125,6 @@ public class SwiftSGP4 {
 //        if targets[satrecIndex].NORAD_CAT_ID == 25544 {
 //            print("ISS z: \(self.coordinates[satrecIndex][0])")
 //        }
-    }
-
-    private func dateString2Date( _ dateString: String)->Date {
-        let dateFormat = DateFormatter()
-        dateFormat.timeZone = TimeZone(abbreviation: "UTC")
-        dateFormat.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
-        let date = dateFormat.date(from: dateString)!
-        return date
-    }
-    
-    private func timestampToJD( _ dateString: String)->Double {
-        let date = dateString2Date( dateString)
-        let calendar = Calendar.current
-        let  components  =  calendar.dateComponents([.year, .month, .day, .hour, .minute, .second],  from:  date)
-        let year = components.year!.int32()
-        let month = components.month!.int32()
-        let day = components.day!.int32()
-        let hour = components.hour!.int32()
-        let minutes = components.minute!.int32()
-         let seconds = Double(components.second!)
-        var jd:Double = 0.0
-        var jdFrac:Double = 0.0
-        
-        jday(year, month, day, hour, minutes, seconds, &jd, &jdFrac)
-        let epoch = jd + jdFrac
-return epoch
     }
     
 }

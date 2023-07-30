@@ -14,9 +14,6 @@ let utc2000Components = DateComponents(year: 2000, month: 1, day: 1)
 let jd2000:Double = 2451545.0
 let utc2000 = calendar.date(from: utc2000Components)!
 
-extension SwiftSGP4 {
-    
-    
     func getJulianFromUnix(_ unixSecs: Double) -> Double {
         return (unixSecs / 86400.0) + 2440587.5
     }
@@ -63,4 +60,36 @@ extension SwiftSGP4 {
         let updatedDate = dt.addingTimeInterval(milliseconds / 1000)
         return updatedDate
     }
+    
+func dateString2Date( _ dateString: String)->Date {
+        let dateFormat = DateFormatter()
+        dateFormat.timeZone = TimeZone(abbreviation: "UTC")
+        dateFormat.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
+        let date = dateFormat.date(from: dateString)!
+        return date
+    }
+    
+    func timestampToJD( _ date: Date)->Double {
+        let calendar = Calendar.current
+        let  components  =  calendar.dateComponents([.year, .month, .day, .hour, .minute, .second],  from:  date)
+        let year = components.year!.int32()
+        let month = components.month!.int32()
+        let day = components.day!.int32()
+        let hour = components.hour!.int32()
+        let minutes = components.minute!.int32()
+         let seconds = Double(components.second!)
+        var jd:Double = 0.0
+        var jdFrac:Double = 0.0
+        
+        jday(year, month, day, hour, minutes, seconds, &jd, &jdFrac)
+return jd + jdFrac
+    }
+
+extension SwiftSGP4 {
+    
+    func framesSinceEpoch( _ date: Date)->Int {
+        let timeIntervalInSeconds = date.timeIntervalSince(epoch)
+        return 0
+    }
+    
 }
