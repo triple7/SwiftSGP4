@@ -88,9 +88,8 @@ return jd + jdFrac
 extension SwiftSGP4 {
     
     public func framesSinceEpoch( _ date: Date)->Int {
-        let timeIntervalInSeconds = date.timeIntervalSince(epoch)
-        let forwardDelta = 1/(timeIntervalInSeconds*60*Double(self.fps))
-        return Int(ceil(forwardDelta/delta))
+        let forwardDelta = date.timeIntervalSince(epoch)
+        return Int(ceil(forwardDelta/(delta*60)))
     }
     
     public func steerOffset( _ startDelta: Double, _ index: Int, _ factor: Double = 1)-> (Double, Int) {
