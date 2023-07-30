@@ -90,8 +90,6 @@ jdEpoch = timestampToJD(epoch)
         // delta = (1/(60*fps)
         // and count = seconds*fps
         delta = 1/Double(secondsFromEpoch*60*fps)
-        // save the last frame from epoch for the next cycle
-        lastTSince = Double(self.bufferCount)*delta
 
             
         DispatchQueue.concurrentPerform(iterations: self.targetCount, execute:  { i in
@@ -110,12 +108,15 @@ jdEpoch = timestampToJD(epoch)
         var satrec = satRecs[satrecIndex]
             
         // Calculate the target states from epoch to secondsFromEpoch
+        var lastSince:Double = 0
         DispatchQueue.concurrentPerform(iterations: self.bufferCount, execute:  { i in
             // orbital set
             var ro = [Double](repeating: 0, count: 3)
             var vo = [Double](repeating: 0, count: 3)
 
-            let lastSince = Double(i)*delta
+            lastSince = Double(i)*delta
+            // save the last frame from epoch for the next cycle
+
             sgp4(&satrec, lastTSince + lastSince, &ro, &vo)
             // transform from TEME to GTRF
             var RGtrf = [Double](repeating: 0, count: 3)
@@ -126,6 +127,8 @@ jdEpoch = timestampToJD(epoch)
             teme2ecefOptimised(&ro, epoch, gmstCos, gmstSin, &RGtrf)
             self.coordinates[satrecIndex][i + currentBufferOffset] = SIMD3<Double>(RGtrf)
         })
+        // store the last time since for the next cycle
+        lastTSince += lastSince
 //        if targets[satrecIndex].NORAD_CAT_ID == 25544 {
 //            print("ISS z: \(self.coordinates[satrecIndex][0])")
 //        }
