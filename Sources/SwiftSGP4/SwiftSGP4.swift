@@ -27,6 +27,7 @@ public class SwiftSGP4 {
 
      public let targetCount:Int
     public let bufferCount:Int
+    private let bufferOffset:Int
     internal let epoch:Date
     private let jdEpoch:Double
 
@@ -43,6 +44,7 @@ public class SwiftSGP4 {
         self.xpdotInv = self.xpdotp*self.minPDay
         self.xpdotInv2 = self.xpdotp*self.minPDay*self.minPDay
         self.bufferCount = self.secondsFromEpoch*self.fps
+        self.bufferOffset = self.bufferCount
 
  epoch = dateString2Date(targets.first!.EPOCH)
 jdEpoch = timestampToJD(epoch)
@@ -74,7 +76,7 @@ jdEpoch = timestampToJD(epoch)
             satRecs.append(satrec)
         }
 
-        let targetFrames = ContiguousArray<SIMD3<Double>>(repeating: zeroSimd, count: secondsFromEpoch*fps)
+        let targetFrames = ContiguousArray<SIMD3<Double>>(repeating: zeroSimd, count: self.bufferCount + self.bufferOffset)
         self.coordinates = ContiguousArray<ContiguousArray<SIMD3<Double>>>(repeating: targetFrames, count: targetCount)
     }
 
@@ -99,6 +101,8 @@ jdEpoch = timestampToJD(epoch)
     private let zeroSimd = SIMD3<Double>([0, 0, 0])
     // Using generic number as we don't need satNum for propagation
     private var genSatNum = (Int8(77), Int8(77), Int8(77), Int8(77), Int8(77), Int8(77))
+    // using index to circle around the frames buffer
+    private var currentBufferOffset:Int = 0
     public func computeITRF(_ satrecIndex: Int, _ epoch: Double, _ delta: Double) {
 
         // struct to pass to sgp4 function
@@ -119,11 +123,12 @@ jdEpoch = timestampToJD(epoch)
             let gmstSin = sin(gmst)
 
             teme2ecefOptimised(&ro, epoch, gmstCos, gmstSin, &RGtrf)
-            self.coordinates[satrecIndex][i] = SIMD3<Double>(RGtrf)
+            self.coordinates[satrecIndex][i + currentBufferOffset] = SIMD3<Double>(RGtrf)
         })
 //        if targets[satrecIndex].NORAD_CAT_ID == 25544 {
 //            print("ISS z: \(self.coordinates[satrecIndex][0])")
 //        }
+        self.currentBufferOffset = (self.currentBufferOffset + self.bufferOffset) % self.bufferOffset*2
     }
     
 }
