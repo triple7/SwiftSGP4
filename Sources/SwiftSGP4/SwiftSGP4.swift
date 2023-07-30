@@ -111,7 +111,7 @@ jdEpoch = timestampToJD(epoch)
             var vo = [Double](repeating: 0, count: 3)
 
             let lastSince = Double(i)*delta
-            sgp4(&satrec, lastSince, &ro, &vo)
+            sgp4(&satrec, lastTSince + lastSince, &ro, &vo)
             // transform from TEME to GTRF
             var RGtrf = [Double](repeating: 0, count: 3)
             let gmst = gstime(jdut1: epoch)
