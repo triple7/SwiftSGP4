@@ -25,7 +25,7 @@ public class SwiftSGP4 {
     private let secondsFromEpoch:Int = 1
     private let fps:Int = 30
 
-     let targetCount:Int
+     public let targetCount:Int
     internal let epoch:Date
     private let jdEpoch:Double
 
