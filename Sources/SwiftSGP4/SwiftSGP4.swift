@@ -26,6 +26,7 @@ public class SwiftSGP4 {
     private let fps:Int = 30
 
      public let targetCount:Int
+    public let bufferCount:Int
     internal let epoch:Date
     private let jdEpoch:Double
 
@@ -41,11 +42,12 @@ public class SwiftSGP4 {
         self.xpdotp = self.minPDay/(2.0*pi)
         self.xpdotInv = self.xpdotp*self.minPDay
         self.xpdotInv2 = self.xpdotp*self.minPDay*self.minPDay
+        self.bufferCount = self.secondsFromEpoch*self.fps
 
  epoch = dateString2Date(targets.first!.EPOCH)
 jdEpoch = timestampToJD(epoch)
         self.satRecs = [elsetrec]()
-        var target = targets.first!
+//        var target = targets.first!
 //        print("jd \(jd)")
 //        print(" jdfrac: \(jdFrac)")
 //        print("bstar \(target.BSTAR)")
@@ -78,7 +80,6 @@ jdEpoch = timestampToJD(epoch)
 
     public func propagateOmms( _ minDelta: Double = 1/60 /* seconds */) {
         
-                                   let count = targets.count
         // time dimension parameters
         // We are propagating from
         // epoch to secondsFromEpoch by frames per second
@@ -86,27 +87,25 @@ jdEpoch = timestampToJD(epoch)
         // delta = (1/(60*fps)
         // and count = seconds*fps
         let delta:Double = 1/Double(secondsFromEpoch*60*fps)
-        let dCount = secondsFromEpoch*fps
         // save the last frame from epoch for the next cycle
-        lastTSince = Double(dCount)*delta
+        lastTSince = Double(self.bufferCount)*delta
 
             
-        DispatchQueue.concurrentPerform(iterations: count, execute:  { i in
-            computeITRF(i, jdEpoch, delta, dCount)
+        DispatchQueue.concurrentPerform(iterations: self.targetCount, execute:  { i in
+            computeITRF(i, jdEpoch, delta)
         })
     }
     
     private let zeroSimd = SIMD3<Double>([0, 0, 0])
     // Using generic number as we don't need satNum for propagation
     private var genSatNum = (Int8(77), Int8(77), Int8(77), Int8(77), Int8(77), Int8(77))
-    public func computeITRF(_ satrecIndex: Int, _ epoch: Double, _ delta: Double, _ dCount
-                            : Int) {
+    public func computeITRF(_ satrecIndex: Int, _ epoch: Double, _ delta: Double) {
 
         // struct to pass to sgp4 function
         var satrec = satRecs[satrecIndex]
             
         // Calculate the target states from epoch to secondsFromEpoch
-        DispatchQueue.concurrentPerform(iterations: dCount, execute:  { i in
+        DispatchQueue.concurrentPerform(iterations: self.bufferCount, execute:  { i in
             // orbital set
             var ro = [Double](repeating: 0, count: 3)
             var vo = [Double](repeating: 0, count: 3)
