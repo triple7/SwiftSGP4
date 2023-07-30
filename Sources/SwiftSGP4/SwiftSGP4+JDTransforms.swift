@@ -92,5 +92,9 @@ extension SwiftSGP4 {
         let forwardDelta = 1/(timeIntervalInSeconds*60*Double(self.fps))
         return Int(ceil(forwardDelta/delta))
     }
+
+    public func offsetFromFrame( _ startDelta: Double)-> Double {
+        return startDelta - self.delta
+    }
     
 }
