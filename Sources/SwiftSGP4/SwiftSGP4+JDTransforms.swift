@@ -94,9 +94,7 @@ extension SwiftSGP4 {
     }
     
     public func steerOffset( _ startDelta: Double, _ index: Int, _ factor: Double = 1)-> (Double, Int) {
-        let deltaPMin = startDelta/Double(self.fps)
-        print("delta per min: \(deltaPMin) \(delta)")
-        let offsetDelta = deltaPMin - self.delta*factor
+        let offsetDelta = startDelta - self.delta*factor*60
         if offsetDelta < 0 {
             return (offsetDelta, index)
         } else {
