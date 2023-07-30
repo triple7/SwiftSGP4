@@ -115,7 +115,6 @@ jdEpoch = timestampToJD(epoch)
             var vo = [Double](repeating: 0, count: 3)
 
             lastSince = Double(i)*delta
-            // save the last frame from epoch for the next cycle
 
             sgp4(&satrec, lastTSince + lastSince, &ro, &vo)
             // transform from TEME to GTRF
@@ -132,6 +131,7 @@ jdEpoch = timestampToJD(epoch)
 //        if targets[satrecIndex].NORAD_CAT_ID == 25544 {
 //            print("ISS z: \(self.coordinates[satrecIndex][0])")
 //        }
+        // Double buffer to cycle around
         self.currentBufferOffset = (self.currentBufferOffset + self.bufferOffset) % self.bufferOffset*2
     }
     
