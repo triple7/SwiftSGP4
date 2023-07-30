@@ -89,7 +89,8 @@ extension SwiftSGP4 {
     
     func framesSinceEpoch( _ date: Date)->Int {
         let timeIntervalInSeconds = date.timeIntervalSince(epoch)
-        return 0
+        let forwardDelta = 1/(timeIntervalInSeconds*60*Double(self.fps))
+        return Int(ceil(forwardDelta/delta))
     }
     
 }

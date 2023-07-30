@@ -23,13 +23,14 @@ public class SwiftSGP4 {
     private var lastTSince:Double = 0
     // default second since last and fps
     private let secondsFromEpoch:Int = 1
-    private let fps:Int = 30
+    internal let fps:Int = 30
 
      public let targetCount:Int
     public let bufferCount:Int
     private let bufferOffset:Int
     internal let epoch:Date
     private let jdEpoch:Double
+    internal var delta:Double = 0
 
     
     public init(_ targets: [CelesTrakTarget]) {
@@ -88,7 +89,7 @@ jdEpoch = timestampToJD(epoch)
         // such that:
         // delta = (1/(60*fps)
         // and count = seconds*fps
-        let delta:Double = 1/Double(secondsFromEpoch*60*fps)
+        delta = 1/Double(secondsFromEpoch*60*fps)
         // save the last frame from epoch for the next cycle
         lastTSince = Double(self.bufferCount)*delta
 
