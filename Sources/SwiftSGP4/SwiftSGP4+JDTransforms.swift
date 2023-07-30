@@ -93,13 +93,14 @@ extension SwiftSGP4 {
         return Int(ceil(forwardDelta/delta))
     }
     
-    public func steerOffset( _ startDelta: Double, _ index: Int)-> (Double, Int) {
-        print("startDelta: \(startDelta) \(delta)")
-        let offsetDelta = startDelta - self.delta
+    public func steerOffset( _ startDelta: Double, _ index: Int, _ factor: Double = 1)-> (Double, Int) {
+        let deltaPMin = startDelta/Double(self.fps)
+        print("delta per min: \(deltaPMin) \(delta)")
+        let offsetDelta = deltaPMin - self.delta*factor
         if offsetDelta < 0 {
             return (offsetDelta, index)
         } else {
-            return steerOffset(startDelta + delta, index + 1)
+            return steerOffset(startDelta + delta, index + 1, factor + 1)
         }
     }
 
