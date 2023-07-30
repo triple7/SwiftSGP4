@@ -94,6 +94,7 @@ extension SwiftSGP4 {
     }
     
     public func steerOffset( _ startDelta: Double, _ index: Int)-> (Double, Int) {
+        print("startDelta: \(startDelta) \(delta)")
         let offsetDelta = startDelta - self.delta
         if offsetDelta < 0 {
             return (offsetDelta, index)
