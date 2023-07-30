@@ -89,7 +89,7 @@ extension SwiftSGP4 {
     
     public func framesSinceEpoch( _ date: Date)->Int {
         let forwardDelta = date.timeIntervalSince(epoch)
-        return Int(ceil(forwardDelta/(delta*60)))
+        return Int(ceil(forwardDelta/(delta)))
     }
     
     public func steerOffset( _ startDelta: Double, _ index: Int, _ factor: Double = 1)-> (Double, Int) {
