@@ -88,7 +88,8 @@ return jd + jdFrac
 extension SwiftSGP4 {
     
     public func framesSinceEpoch( _ date: Date)->Int {
-        let forwardDelta = date.timeIntervalSince(epoch)
+        let secondsSinceDelta = date.timeIntervalSince(epoch)
+        let forwardDelta = 1/(secondsSinceDelta*Double(self.fps))
         return Int(ceil(forwardDelta/(delta)))
     }
     
