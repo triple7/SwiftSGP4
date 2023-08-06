@@ -36,7 +36,7 @@ public class SwiftSGP4 {
     public init(_ targets: [CelesTrakTarget]) {
         
         self.targets = targets
-        self.targetCount = targets.count
+        self.targetCount = 10
         self.rad = 180.0/self.pi
         self.deg2rad = pi / 180.0
         self.minPDay = 1440.0
