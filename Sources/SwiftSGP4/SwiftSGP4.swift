@@ -95,7 +95,8 @@ jdEpoch = timestampToJD(epoch)
         DispatchQueue.concurrentPerform(iterations: self.targetCount, execute:  { i in
             computeITRF(i, jdEpoch, delta)
         })
-        print(self.currentBufferOffset)
+        // Double buffer to cycle around
+        self.currentBufferOffset = (self.currentBufferOffset + self.bufferOffset) % self.bufferOffset*2
     }
     
     private let zeroSimd = SIMD3<Double>([0, 0, 0])
@@ -132,8 +133,6 @@ jdEpoch = timestampToJD(epoch)
 //        if targets[satrecIndex].NORAD_CAT_ID == 25544 {
 //            print("ISS z: \(self.coordinates[satrecIndex][0])")
 //        }
-        // Double buffer to cycle around
-        self.currentBufferOffset = (self.currentBufferOffset + self.bufferOffset) % self.bufferOffset*2
     }
     
 }
