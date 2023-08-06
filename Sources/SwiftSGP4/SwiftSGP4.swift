@@ -119,7 +119,7 @@ public class SwiftSGP4 {
             self.currentBufferOffset = 0
         }
         // store the last time since for the next cycle
-        lastTSince += 300*delta
+        lastTSince += 3000*delta
     }
     
     private let zeroSimd = SIMD3<Double>([0, 0, 0])
