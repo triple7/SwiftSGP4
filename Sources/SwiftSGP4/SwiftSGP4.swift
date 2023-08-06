@@ -98,7 +98,7 @@ jdEpoch = timestampToJD(epoch)
         // Double buffer to cycle around
         self.currentBufferOffset = self.currentBufferOffset + self.bufferOffset
         if self.currentBufferOffset == self.bufferCount*2 {
-            self.bufferOffset = 0
+            self.currentBufferOffset = 0
         }
         // store the last time since for the next cycle
         lastTSince += 30*delta
