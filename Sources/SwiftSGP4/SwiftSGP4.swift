@@ -41,7 +41,7 @@ public class SwiftSGP4 {
         self.deg2rad = pi / 180.0
         self.minPDay = 1440
         self.secPDay = 1440*60
-        self.xpdotp = self.secPDay/(2.0*pi)
+        self.xpdotp = self.minPDay/(2.0*pi)
         self.xpdotInv = self.xpdotp*self.minPDay
         self.xpdotInv2 = self.xpdotp*self.minPDay*self.minPDay
         self.bufferCount = self.secondsFromEpoch*self.fps
