@@ -19,8 +19,6 @@ public class SwiftSGP4 {
     public var coordinates:ContiguousArray<ContiguousArray<SIMD3<Double>>>
     // improved algorithm
     private let opsMode:CChar = "a".cString(using: .utf8)![0]
-// last minute since value time propagation was calculated
-    private var lastTSince:Double = 0
     // default second since last and fps
     private let secondsFromEpoch:Int = 1
     internal let fps:Int = 30
@@ -28,8 +26,10 @@ public class SwiftSGP4 {
      public let targetCount:Int
     public let bufferCount:Int
     private let bufferOffset:Int
-    internal let epoch:Date
-    private let jdEpoch:Double
+    internal var epochs = [Date]()
+    internal var jdEpochs = [Double]()
+    // last minute since value time propagation was calculated
+        private var lastTimesSince = [Double]()
     internal var delta:Double = 0
 
     
@@ -47,8 +47,6 @@ public class SwiftSGP4 {
         self.bufferCount = self.secondsFromEpoch*self.fps
         self.bufferOffset = self.bufferCount
 
- epoch = dateString2Date(targets.first!.EPOCH)
-jdEpoch = timestampToJD(epoch)
         self.satRecs = [elsetrec]()
 //        var target = targets.first!
 //        print("jd \(jd)")
@@ -69,12 +67,22 @@ jdEpoch = timestampToJD(epoch)
             satrec.revnum = target.REV_AT_EPOCH
             satrec.classification = target.CLASSIFICATION_TYPE.cString(using: .unicode)![0]
             satrec.ephtype = 0
+            let epoch = dateString2Date(target.EPOCH)
+           let jdEpoch = timestampToJD(epoch)
+            let currentJd = timestampToJD(Date())
+            let tmOffsetJd = Double(TimeZone.current.secondsFromGMT()/86400)
+            let lastTSince = currentJd - jdEpoch - tmOffsetJd
+            
             _ = sgp4init(wgs72, opsMode, &genSatNum
                          , jdEpoch - jd1950, target.BSTAR, target.MEAN_MOTION_DOT/xpdotInv, target.MEAN_MOTION_DDOT/xpdotInv2, target.ECCENTRICITY, target.ARG_OF_PERICENTER*deg2rad, target.INCLINATION*deg2rad, target.MEAN_ANOMALY*deg2rad,
                          target.MEAN_MOTION/xpdotp, target.RA_OF_ASC_NODE*deg2rad, &satrec)
 
             
             satRecs.append(satrec)
+            epochs.append(epoch)
+            jdEpochs.append(jdEpoch)
+            lastTimesSince.append(lastTSince)
+            
         }
 
         let targetFrames = ContiguousArray<SIMD3<Double>>(repeating: zeroSimd, count: self.bufferCount + self.bufferOffset)
@@ -93,15 +101,13 @@ jdEpoch = timestampToJD(epoch)
 
             
         DispatchQueue.concurrentPerform(iterations: self.targetCount, execute:  { i in
-            computeITRF(i, jdEpoch, delta)
+            computeITRF(i, jdEpochs[i], delta)
         })
         // Double buffer to cycle around
         self.currentBufferOffset = self.currentBufferOffset + self.bufferOffset
         if self.currentBufferOffset == self.bufferCount*2 {
             self.currentBufferOffset = 0
         }
-        // store the last time since for the next cycle
-        lastTSince += 30*delta
     }
     
     private let zeroSimd = SIMD3<Double>([0, 0, 0])
@@ -122,7 +128,7 @@ jdEpoch = timestampToJD(epoch)
 
             lastSince = Double(i+1)*delta
 
-            sgp4(&satrec, lastTSince + lastSince, &ro, &vo)
+            sgp4(&satrec, lastTimesSince[satrecIndex] + lastSince, &ro, &vo)
             // transform from TEME to GTRF
             var RGtrf = [Double](repeating: 0, count: 3)
             let gmst = gstime(jdut1: epoch)
