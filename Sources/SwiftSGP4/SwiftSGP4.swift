@@ -36,7 +36,7 @@ public class SwiftSGP4 {
     public init(_ targets: [CelesTrakTarget]) {
         
         self.targets = targets
-        self.targetCount = 10
+        self.targetCount = targets.count
         self.rad = 180.0/self.pi
         self.deg2rad = pi / 180.0
         self.minPDay = 1440.0
@@ -62,35 +62,36 @@ public class SwiftSGP4 {
 //        print("mean anomaly \(target.MEAN_ANOMALY)")
 //        print("mean motion\(target.MEAN_MOTION)")
 //        print("rra of node\(target.RA_OF_ASC_NODE)")
-        let reducedSats = [57342, 57345, 57340, 57343, 57341, 57338, 57336, 57337, 57339, 57334]
+//        let reducedSats = [57342, 57345, 57340, 57343, 57341, 57338, 57336, 57337, 57339, 57334]
         var uniqueDates = [String]()
         for target in targets {
-            if reducedSats.contains(target.NORAD_CAT_ID){
-                if !uniqueDates.contains(target.EPOCH){
-                    uniqueDates.append(target.EPOCH)
-                }
-                var satrec = elsetrec()
-                satrec.elnum = target.ELEMENT_SET_NO
-                satrec.revnum = target.REV_AT_EPOCH
-                satrec.classification = target.CLASSIFICATION_TYPE.cString(using: .unicode)![0]
-                satrec.ephtype = 0
-                _ = sgp4init(wgs72, opsMode, &genSatNum
-                             , jdEpoch - jd1950,
-                             target.BSTAR,
-                             target.MEAN_MOTION_DOT/xpdotInv,
-                             target.MEAN_MOTION_DDOT/xpdotInv2,
-                             target.ECCENTRICITY,
-                             target.ARG_OF_PERICENTER*deg2rad,
-                             target.INCLINATION*deg2rad,
-                             target.MEAN_ANOMALY*deg2rad,
-                             target.MEAN_MOTION/xpdotp,
-                             target.RA_OF_ASC_NODE*deg2rad,
-                             &satrec)
-                
-                print("adding sattelite with ID NORAD_CAT_ID: \(target.NORAD_CAT_ID)")
-                satRecs.append(satrec)
+//            if !reducedSats.contains(target.NORAD_CAT_ID){
+//                continue
+//            }
+            if !uniqueDates.contains(target.EPOCH){
+                uniqueDates.append(target.EPOCH)
             }
-        }
+            var satrec = elsetrec()
+            satrec.elnum = target.ELEMENT_SET_NO
+            satrec.revnum = target.REV_AT_EPOCH
+            satrec.classification = target.CLASSIFICATION_TYPE.cString(using: .unicode)![0]
+            satrec.ephtype = 0
+            _ = sgp4init(wgs72, opsMode, &genSatNum
+                         , jdEpoch - jd1950,
+                         target.BSTAR,
+                         target.MEAN_MOTION_DOT/xpdotInv,
+                         target.MEAN_MOTION_DDOT/xpdotInv2,
+                         target.ECCENTRICITY,
+                         target.ARG_OF_PERICENTER*deg2rad,
+                         target.INCLINATION*deg2rad,
+                         target.MEAN_ANOMALY*deg2rad,
+                         target.MEAN_MOTION/xpdotp,
+                         target.RA_OF_ASC_NODE*deg2rad,
+                         &satrec)
+            
+            print("adding sattelite with ID NORAD_CAT_ID: \(target.NORAD_CAT_ID)")
+            satRecs.append(satrec)
+            }
         print("unique Datas \(uniqueDates)")
 
         let targetFrames = ContiguousArray<SIMD3<Double>>(repeating: zeroSimd, count: self.bufferCount + self.bufferOffset)
