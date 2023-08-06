@@ -69,7 +69,7 @@ public class SwiftSGP4 {
             satrec.ephtype = 0
             let epoch = dateString2Date(target.EPOCH)
            let jdEpoch = timestampToJD(epoch)
-            let currentJd = timestampToJD(Date()) - jd1950
+            let currentJd = timestampToJD(Date())
             let tmOffsetJd = Double(TimeZone.current.secondsFromGMT())/86400
             let lastTSince = (currentJd - jdEpoch - tmOffsetJd)*1440
             
