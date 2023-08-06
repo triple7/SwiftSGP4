@@ -69,9 +69,9 @@ public class SwiftSGP4 {
             satrec.ephtype = 0
             let epoch = dateString2Date(target.EPOCH)
            let jdEpoch = timestampToJD(epoch)
-            let currentJd = timestampToJD(Date())
-            let tmOffsetJd = Double(TimeZone.current.secondsFromGMT()/86400)
-            let lastTSince = currentJd - jdEpoch - tmOffsetJd
+            let currentJd = timestampToJD(Date()) - jd1950
+            let tmOffsetJd = Double(TimeZone.current.secondsFromGMT())/86400
+            let lastTSince = (currentJd - jdEpoch - tmOffsetJd)*1440
             
             _ = sgp4init(wgs72, opsMode, &genSatNum
                          , jdEpoch - jd1950, target.BSTAR, target.MEAN_MOTION_DOT/xpdotInv, target.MEAN_MOTION_DDOT/xpdotInv2, target.ECCENTRICITY, target.ARG_OF_PERICENTER*deg2rad, target.INCLINATION*deg2rad, target.MEAN_ANOMALY*deg2rad,
@@ -89,6 +89,7 @@ public class SwiftSGP4 {
         self.coordinates = ContiguousArray<ContiguousArray<SIMD3<Double>>>(repeating: targetFrames, count: targetCount)
     }
 
+    fileprivate var lastAppTSince:Double = 0
     public func propagateOmms( _ minDelta: Double = 1/60 /* seconds */) {
         
         // time dimension parameters
@@ -108,6 +109,7 @@ public class SwiftSGP4 {
         if self.currentBufferOffset == self.bufferCount*2 {
             self.currentBufferOffset = 0
         }
+        lastAppTSince += Double(fps)*delta
     }
     
     private let zeroSimd = SIMD3<Double>([0, 0, 0])
@@ -126,7 +128,7 @@ public class SwiftSGP4 {
             var ro = [Double](repeating: 0, count: 3)
             var vo = [Double](repeating: 0, count: 3)
 
-            lastSince = Double(i+1)*delta
+            lastSince = lastAppTSince + Double(i+1)*delta
 
             sgp4(&satrec, lastTimesSince[satrecIndex] + lastSince, &ro, &vo)
             // transform from TEME to GTRF
