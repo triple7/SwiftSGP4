@@ -90,6 +90,7 @@ jdEpoch = timestampToJD(epoch)
         // delta = (1/(60*fps)
         // and count = seconds*fps
         delta = 1/Double(secondsFromEpoch*60*fps)
+        print("epoch: \(epoch)")
         print("jdEpoch: \(jdEpoch)")
         print("lastTSince: \(lastTSince)")
         DispatchQueue.concurrentPerform(iterations: self.targetCount, execute:  { i in
