@@ -128,7 +128,7 @@ jdEpoch = timestampToJD(epoch)
         })
         // store the last time since for the next cycle
         lastTSince += lastSince
-        print("last T since: \(lastTSince)")
+//        if targets[satrecIndex].NORAD_CAT_ID == 25544 {
 //        if targets[satrecIndex].NORAD_CAT_ID == 25544 {
 //            print("ISS z: \(self.coordinates[satrecIndex][0])")
 //        }
