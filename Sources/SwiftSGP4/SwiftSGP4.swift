@@ -120,8 +120,7 @@ jdEpoch = timestampToJD(epoch)
             var ro = [Double](repeating: 0, count: 3)
             var vo = [Double](repeating: 0, count: 3)
 
-            print(i)
-            lastSince = Double(i)*delta
+            lastSince = Double(i+1)*delta
 
             sgp4(&satrec, lastTSince + lastSince, &ro, &vo)
             // transform from TEME to GTRF
