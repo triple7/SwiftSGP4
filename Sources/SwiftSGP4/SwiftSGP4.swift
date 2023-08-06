@@ -41,9 +41,9 @@ public class SwiftSGP4 {
         self.deg2rad = pi / 180.0
         self.minPDay = 1440
         self.secPDay = 1440*60
-        self.xpdotp = self.minPDay/(2.0*pi)
-        self.xpdotInv = self.xpdotp*self.minPDay
-        self.xpdotInv2 = self.xpdotp*self.minPDay*self.minPDay
+        self.xpdotp = self.secPDay/(2.0*pi)
+        self.xpdotInv = self.xpdotp*self.secPDay
+        self.xpdotInv2 = self.xpdotp*self.secPDay*self.secPDay
         self.bufferCount = self.secondsFromEpoch*self.fps
         self.bufferOffset = self.bufferCount
 
@@ -132,10 +132,6 @@ jdEpoch = timestampToJD(epoch)
             teme2ecefOptimised(&ro, epoch, gmstCos, gmstSin, &RGtrf)
             self.coordinates[satrecIndex][i + currentBufferOffset] = SIMD3<Double>(RGtrf)
         })
-//        if targets[satrecIndex].NORAD_CAT_ID == 25544 {
-//        if targets[satrecIndex].NORAD_CAT_ID == 25544 {
-//            print("ISS z: \(self.coordinates[satrecIndex][0])")
-//        }
     }
     
 }
