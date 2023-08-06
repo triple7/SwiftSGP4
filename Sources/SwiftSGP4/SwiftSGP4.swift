@@ -95,6 +95,7 @@ jdEpoch = timestampToJD(epoch)
         DispatchQueue.concurrentPerform(iterations: self.targetCount, execute:  { i in
             computeITRF(i, jdEpoch, delta)
         })
+        print(self.coordinates[0])
     }
     
     private let zeroSimd = SIMD3<Double>([0, 0, 0])
