@@ -63,9 +63,12 @@ public class SwiftSGP4 {
 //        print("mean motion\(target.MEAN_MOTION)")
 //        print("rra of node\(target.RA_OF_ASC_NODE)")
         let reducedSats = [57342, 57345, 57340, 57343, 57341, 57338, 57336, 57337, 57339, 57334]
+        var uniqueDates = [String]()
         for target in targets {
             if reducedSats.contains(target.NORAD_CAT_ID){
-                
+                if !uniqueDates.contains(target.EPOCH){
+                    uniqueDates.append(target.EPOCH)
+                }
                 var satrec = elsetrec()
                 satrec.elnum = target.ELEMENT_SET_NO
                 satrec.revnum = target.REV_AT_EPOCH
@@ -88,6 +91,7 @@ public class SwiftSGP4 {
                 satRecs.append(satrec)
             }
         }
+        print("unique Datas \(uniqueDates)")
 
         let targetFrames = ContiguousArray<SIMD3<Double>>(repeating: zeroSimd, count: self.bufferCount + self.bufferOffset)
         self.coordinates = ContiguousArray<ContiguousArray<SIMD3<Double>>>(repeating: targetFrames, count: targetCount)
