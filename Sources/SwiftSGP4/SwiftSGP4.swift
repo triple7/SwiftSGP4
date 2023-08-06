@@ -96,7 +96,10 @@ jdEpoch = timestampToJD(epoch)
             computeITRF(i, jdEpoch, delta)
         })
         // Double buffer to cycle around
-        self.currentBufferOffset = (self.currentBufferOffset + self.bufferOffset) % self.bufferOffset*2
+        self.currentBufferOffset = self.currentBufferOffset + self.bufferOffset
+        if self.currentBufferOffset == self.bufferCount*2 {
+            self.bufferOffset = 0
+        }
         // store the last time since for the next cycle
         lastTSince += 30*delta
         print(self.currentBufferOffset)
