@@ -138,7 +138,7 @@ jdEpoch = timestampToJD(epoch)
                 let y = a2.y - a1.y
                 let z = a2.z - a1.z
                 let distance = sqrt(x*x + y*y + z*z)
-                print("\(i) \(distance)")
+                print("\(targets[satrecIndex].NORAD_CAT_ID) \(i) \(distance)")
             }
         })
 //        if targets[satrecIndex].NORAD_CAT_ID == 25544 {
