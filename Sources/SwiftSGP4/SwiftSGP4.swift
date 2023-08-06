@@ -102,6 +102,7 @@ jdEpoch = timestampToJD(epoch)
         }
         // store the last time since for the next cycle
         lastTSince += 30*delta
+        print(lastTSince)
     }
     
     private let zeroSimd = SIMD3<Double>([0, 0, 0])
