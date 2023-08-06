@@ -102,7 +102,6 @@ jdEpoch = timestampToJD(epoch)
         }
         // store the last time since for the next cycle
         lastTSince += 30*delta
-        print(lastTSince)
     }
     
     private let zeroSimd = SIMD3<Double>([0, 0, 0])
@@ -132,6 +131,15 @@ jdEpoch = timestampToJD(epoch)
 
             teme2ecefOptimised(&ro, epoch, gmstCos, gmstSin, &RGtrf)
             self.coordinates[satrecIndex][i + currentBufferOffset] = SIMD3<Double>(RGtrf)
+            if i > 0 {
+                let a2 = self.coordinates[satrecIndex][i + currentBufferOffset]
+                let a1 = self.coordinates[satrecIndex][i - 1 + currentBufferOffset]
+                let x = a2.x-a1.x
+                let y = a2.y - a1.y
+                let z = a2.z - a1.z
+                let distance = sqrt(x*x + y*y + z*z)
+                print("\(i) \(distance)")
+            }
         })
 //        if targets[satrecIndex].NORAD_CAT_ID == 25544 {
 //        if targets[satrecIndex].NORAD_CAT_ID == 25544 {
