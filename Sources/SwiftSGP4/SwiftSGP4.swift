@@ -97,6 +97,9 @@ jdEpoch = timestampToJD(epoch)
         })
         // Double buffer to cycle around
         self.currentBufferOffset = (self.currentBufferOffset + self.bufferOffset) % self.bufferOffset*2
+        // store the last time since for the next cycle
+        lastTSince += 30*delta
+        print(self.currentBufferOffset)
     }
     
     private let zeroSimd = SIMD3<Double>([0, 0, 0])
@@ -115,7 +118,7 @@ jdEpoch = timestampToJD(epoch)
             var ro = [Double](repeating: 0, count: 3)
             var vo = [Double](repeating: 0, count: 3)
 
-            lastSince = Double((i+self.currentBufferOffset))*delta
+            lastSince = Double(i)*delta
 
             sgp4(&satrec, lastTSince + lastSince, &ro, &vo)
             // transform from TEME to GTRF
@@ -127,8 +130,6 @@ jdEpoch = timestampToJD(epoch)
             teme2ecefOptimised(&ro, epoch, gmstCos, gmstSin, &RGtrf)
             self.coordinates[satrecIndex][i + currentBufferOffset] = SIMD3<Double>(RGtrf)
         })
-        // store the last time since for the next cycle
-        lastTSince += lastSince
 //        if targets[satrecIndex].NORAD_CAT_ID == 25544 {
 //        if targets[satrecIndex].NORAD_CAT_ID == 25544 {
 //            print("ISS z: \(self.coordinates[satrecIndex][0])")
