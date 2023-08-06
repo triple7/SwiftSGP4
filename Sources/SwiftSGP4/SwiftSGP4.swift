@@ -106,7 +106,7 @@ public class SwiftSGP4 {
         // such that:
         // delta = (1/(60*fps)
         // and count = seconds*fps
-        delta = 1/Double(secondsFromEpoch*60*fps)
+        delta = 100.0/Double(secondsFromEpoch*60*fps)
 //        print("epoch: \(epoch)")
 //        print("jdEpoch: \(jdEpoch)")
 //        print("lastTSince: \(lastTSince)")
@@ -119,7 +119,7 @@ public class SwiftSGP4 {
             self.currentBufferOffset = 0
         }
         // store the last time since for the next cycle
-        lastTSince += 3000*delta
+        lastTSince += 30*delta
     }
     
     private let zeroSimd = SIMD3<Double>([0, 0, 0])
