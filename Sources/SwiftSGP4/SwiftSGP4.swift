@@ -49,6 +49,7 @@ public class SwiftSGP4 {
 
  epoch = dateString2Date(targets.first!.EPOCH)
 jdEpoch = timestampToJD(epoch)
+        lastTSince += jdEpoch
         self.satRecs = [elsetrec]()
 //        var target = targets.first!
 //        print("jd \(jd)")
