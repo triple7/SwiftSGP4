@@ -95,7 +95,6 @@ jdEpoch = timestampToJD(epoch)
         DispatchQueue.concurrentPerform(iterations: self.targetCount, execute:  { i in
             computeITRF(i, jdEpoch, delta)
         })
-        print(self.coordinates[0])
     }
     
     private let zeroSimd = SIMD3<Double>([0, 0, 0])
@@ -104,7 +103,7 @@ jdEpoch = timestampToJD(epoch)
     // using index to circle around the frames buffer
     private var currentBufferOffset:Int = 0
     public func computeITRF(_ satrecIndex: Int, _ epoch: Double, _ delta: Double) {
-
+        print(self.currentBufferOffset)
         // struct to pass to sgp4 function
         var satrec = satRecs[satrecIndex]
             
