@@ -39,17 +39,16 @@ public class SwiftSGP4 {
         self.targetCount = targets.count
         self.rad = 180.0/self.pi
         self.deg2rad = pi / 180.0
-        self.minPDay = 1440
-        self.secPDay = 1440*60
+        self.minPDay = 1440.0
+        self.secPDay = 1440.0*60.0
         self.xpdotp = self.minPDay/(2.0*pi)
         self.xpdotInv = self.xpdotp*self.minPDay
         self.xpdotInv2 = self.xpdotp*self.minPDay*self.minPDay
         self.bufferCount = self.secondsFromEpoch*self.fps
         self.bufferOffset = self.bufferCount
 
- epoch = dateString2Date(targets.first!.EPOCH)
-jdEpoch = timestampToJD(epoch)
-        lastTSince += jdEpoch
+        epoch = dateString2Date(targets.first!.EPOCH)
+        jdEpoch = timestampToJD(epoch)
         self.satRecs = [elsetrec]()
 //        var target = targets.first!
 //        print("jd \(jd)")
@@ -71,10 +70,19 @@ jdEpoch = timestampToJD(epoch)
             satrec.classification = target.CLASSIFICATION_TYPE.cString(using: .unicode)![0]
             satrec.ephtype = 0
             _ = sgp4init(wgs72, opsMode, &genSatNum
-                         , jdEpoch - jd1950, target.BSTAR, target.MEAN_MOTION_DOT/xpdotInv, target.MEAN_MOTION_DDOT/xpdotInv2, target.ECCENTRICITY, target.ARG_OF_PERICENTER*deg2rad, target.INCLINATION*deg2rad, target.MEAN_ANOMALY*deg2rad,
-                         target.MEAN_MOTION/xpdotp, target.RA_OF_ASC_NODE*deg2rad, &satrec)
+                         , jdEpoch - jd1950,
+                         target.BSTAR,
+                         target.MEAN_MOTION_DOT/xpdotInv,
+                         target.MEAN_MOTION_DDOT/xpdotInv2,
+                         target.ECCENTRICITY,
+                         target.ARG_OF_PERICENTER*deg2rad,
+                         target.INCLINATION*deg2rad,
+                         target.MEAN_ANOMALY*deg2rad,
+                         target.MEAN_MOTION/xpdotp,
+                         target.RA_OF_ASC_NODE*deg2rad,
+                         &satrec)
 
-            
+            print("adding sattelite with ID NORAD_CAT_ID: \(target.NORAD_CAT_ID)")
             satRecs.append(satrec)
         }
 
@@ -91,9 +99,9 @@ jdEpoch = timestampToJD(epoch)
         // delta = (1/(60*fps)
         // and count = seconds*fps
         delta = 1/Double(secondsFromEpoch*60*fps)
-        print("epoch: \(epoch)")
-        print("jdEpoch: \(jdEpoch)")
-        print("lastTSince: \(lastTSince)")
+//        print("epoch: \(epoch)")
+//        print("jdEpoch: \(jdEpoch)")
+//        print("lastTSince: \(lastTSince)")
         DispatchQueue.concurrentPerform(iterations: self.targetCount, execute:  { i in
             computeITRF(i, jdEpoch, delta)
         })
@@ -134,6 +142,7 @@ jdEpoch = timestampToJD(epoch)
             teme2ecefOptimised(&ro, epoch, gmstCos, gmstSin, &RGtrf)
             self.coordinates[satrecIndex][i + currentBufferOffset] = SIMD3<Double>(RGtrf)
         })
+        
 //        if targets[satrecIndex].NORAD_CAT_ID == 25544 {
 //        if targets[satrecIndex].NORAD_CAT_ID == 25544 {
 //            print("ISS z: \(self.coordinates[satrecIndex][0])")
