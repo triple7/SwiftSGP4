@@ -75,8 +75,11 @@ public class SwiftSGP4 {
             print("target \(target.NORAD_CAT_ID) has epoch at \(target.EPOCH)")
            let jdEpoch = timestampToJD(epoch)
             let currentJd = timestampToJD(Date())
-            let tmOffsetJd = Double(TimeZone.current.secondsFromGMT())/86400
+//            let tmOffsetJd = Double(TimeZone.current.secondsFromGMT())/86400
+            let tmOffsetJd = 0.0
+            
             let lastTSince = (currentJd - jdEpoch - tmOffsetJd)*1440
+            
             
             _ = sgp4init(wgs72, opsMode, &genSatNum
                          , jdEpoch - jd1950, target.BSTAR, target.MEAN_MOTION_DOT/xpdotInv, target.MEAN_MOTION_DDOT/xpdotInv2, target.ECCENTRICITY, target.ARG_OF_PERICENTER*deg2rad, target.INCLINATION*deg2rad, target.MEAN_ANOMALY*deg2rad,
