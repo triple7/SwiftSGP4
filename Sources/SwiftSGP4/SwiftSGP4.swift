@@ -68,6 +68,7 @@ public class SwiftSGP4 {
             satrec.classification = target.CLASSIFICATION_TYPE.cString(using: .unicode)![0]
             satrec.ephtype = 0
             let epoch = dateString2Date(target.EPOCH)
+            print("target \(target.NORAD_CAT_ID) has epoch at \(target.EPOCH)")
            let jdEpoch = timestampToJD(epoch)
             let currentJd = timestampToJD(Date())
             let tmOffsetJd = Double(TimeZone.current.secondsFromGMT())/86400
