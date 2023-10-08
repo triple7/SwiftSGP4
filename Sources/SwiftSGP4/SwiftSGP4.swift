@@ -140,10 +140,10 @@ public class SwiftSGP4 {
 
             sgp4(&satrec, lastTimesSince[satrecIndex] + lastSince, &ro, &vo)
 //            // transform from TEME to GTRF
-//            var RGtrf = [Double](repeating: 0, count: 3)
-//            let gmst = gstime(jdut1: epoch)
-//            let gmstCos = cos(gmst)
-//            let gmstSin = sin(gmst)
+            var RGtrf = [Double](repeating: 0, count: 3)
+            let gmst = gstime(jdut1: epoch)
+            let gmstCos = cos(gmst)
+            let gmstSin = sin(gmst)
 //
             teme2ecefOptimised(&ro, epoch, gmstCos, gmstSin, &RGtrf)
             self.coordinates[satrecIndex][i + currentBufferOffset] = SIMD3<Double>(RGtrf)
