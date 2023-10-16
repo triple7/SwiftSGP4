@@ -73,7 +73,7 @@ public class SwiftSGP4 {
             satrec.ephtype = 0
             let epoch = dateString2Date(target.EPOCH)
             print("target \(target.NORAD_CAT_ID) has epoch at \(target.EPOCH)")
-           let jdEpoch = timestampToJD(epoch)
+            let jdEpoch = timestampToJD(epoch)
             let currentDate = Date()
             let currentJd = timestampToJD(currentDate)
             print("\(target.NORAD_CAT_ID) jdEpoch: \(jdEpoch)")

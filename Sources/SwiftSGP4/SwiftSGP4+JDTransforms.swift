@@ -77,12 +77,14 @@ func dateString2Date( _ dateString: String)->Date {
         let day = components.day!.int32()
         let hour = components.hour!.int32()
         let minutes = components.minute!.int32()
-         let seconds = Double(components.second!)
+        let seconds = Double(components.second!)
+        print(date)
+        print("timestamp to JD: \(day)/\(month) \(hour):\(minutes)")
         var jd:Double = 0.0
         var jdFrac:Double = 0.0
         
         jday(year, month, day, hour, minutes, seconds, &jd, &jdFrac)
-return jd + jdFrac
+        return jd + jdFrac
     }
 
 extension SwiftSGP4 {
