@@ -71,7 +71,9 @@ func dateString2Date( _ dateString: String)->Date {
     
     func timestampToJD( _ date: Date)->Double {
         let calendar = Calendar.current
-        let  components  =  calendar.dateComponents([.year, .month, .day, .hour, .minute, .second],  from:  date)
+//        calendar.timeZone = TimeZone(identifier: "UTC")
+//        let components = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second],  from:  date)
+        let components = calendar.dateComponents(in: TimeZone(identifier: "UTC")!, from: date)
         let year = components.year!.int32()
         let month = components.month!.int32()
         let day = components.day!.int32()
