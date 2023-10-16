@@ -36,8 +36,10 @@ public class SwiftSGP4 {
     public init(_ targets: [CelesTrakTarget]) {
         
         self.targets = targets
-//        let sattelliteSubsetTargets = [57885,57883,57882,57880,57881,57879,57878,57876]
-        self.targetCount = targets.count
+        let sattelliteSubsetTargets = [57885,57883,57882,57880,57881,57879,57878,57876,
+                                       57913, 57914, 57915, 57916, 57917, 57918, 57919, 57920, 57921,
+                                       56768, 56771, 56773, 56775, 56776, 56782, 56783, 56786]
+        self.targetCount = sattelliteSubsetTargets.count
         self.rad = 180.0/self.pi
         self.deg2rad = pi / 180.0
         self.minPDay = 1440
@@ -63,9 +65,9 @@ public class SwiftSGP4 {
 //        print("rra of node\(target.RA_OF_ASC_NODE)")
 
         for target in targets {
-//            if !sattelliteSubsetTargets.contains(target.NORAD_CAT_ID){
-//                continue
-//            }
+            if !sattelliteSubsetTargets.contains(target.NORAD_CAT_ID){
+                continue
+            }
             var satrec = elsetrec()
             satrec.elnum = target.ELEMENT_SET_NO
             satrec.revnum = target.REV_AT_EPOCH
@@ -76,12 +78,12 @@ public class SwiftSGP4 {
             let jdEpoch = timestampToJD(epoch)
             let currentDate = Date()
             let currentJd = timestampToJD(currentDate)
-//            print("\(target.NORAD_CAT_ID) jdEpoch: \(jdEpoch)")
-//            print("\(target.NORAD_CAT_ID) currentDate: \(currentDate)")
-//            print("\(target.NORAD_CAT_ID) currentJd: \(currentJd)")
+            print("\(target.NORAD_CAT_ID) jdEpoch: \(jdEpoch)")
+            print("\(target.NORAD_CAT_ID) currentDate: \(currentDate)")
+            print("\(target.NORAD_CAT_ID) currentJd: \(currentJd)")
             
             let lastTSince = (currentJd - jdEpoch) * 1440.0
-//            print("\(target.NORAD_CAT_ID) lastTSince: \(lastTSince)")
+            print("\(target.NORAD_CAT_ID) lastTSince: \(lastTSince)")
 
             _ = sgp4init(wgs72, opsMode, &genSatNum
                          , jdEpoch - jd1950, target.BSTAR, target.MEAN_MOTION_DOT/xpdotInv, target.MEAN_MOTION_DDOT/xpdotInv2, target.ECCENTRICITY, target.ARG_OF_PERICENTER*deg2rad, target.INCLINATION*deg2rad, target.MEAN_ANOMALY*deg2rad,
