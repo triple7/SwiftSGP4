@@ -74,13 +74,18 @@ public class SwiftSGP4 {
             let epoch = dateString2Date(target.EPOCH)
             print("target \(target.NORAD_CAT_ID) has epoch at \(target.EPOCH)")
            let jdEpoch = timestampToJD(epoch)
-            let currentJd = timestampToJD(Date())
+            let currentDate = Date()
+            let currentJd = timestampToJD(currentDate)
+            print("\(target.NORAD_CAT_ID) jdEpoch: \(jdEpoch)")
+            print("\(target.NORAD_CAT_ID) currentDate: \(currentDate)")
+            print("\(target.NORAD_CAT_ID) currentJd: \(currentJd)")
+
 //            let tmOffsetJd = Double(TimeZone.current.secondsFromGMT())/86400
             let tmOffsetJd = 0.0
             
             let lastTSince = (currentJd - jdEpoch - tmOffsetJd)*1440
-            
-            
+            print("\(target.NORAD_CAT_ID) lastTSince: \(lastTSince)")
+
             _ = sgp4init(wgs72, opsMode, &genSatNum
                          , jdEpoch - jd1950, target.BSTAR, target.MEAN_MOTION_DOT/xpdotInv, target.MEAN_MOTION_DDOT/xpdotInv2, target.ECCENTRICITY, target.ARG_OF_PERICENTER*deg2rad, target.INCLINATION*deg2rad, target.MEAN_ANOMALY*deg2rad,
                          target.MEAN_MOTION/xpdotp, target.RA_OF_ASC_NODE*deg2rad, &satrec)
@@ -137,7 +142,7 @@ public class SwiftSGP4 {
             var vo = [Double](repeating: 0, count: 3)
 
             lastSince = lastAppTSince + Double(i+1)*delta
-
+            
             sgp4(&satrec, lastTimesSince[satrecIndex] + lastSince, &ro, &vo)
 //            // transform from TEME to GTRF
             var RGtrf = [Double](repeating: 0, count: 3)
