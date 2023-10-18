@@ -150,7 +150,8 @@ public class SwiftSGP4 {
             let gmstSin = sin(gmst)
 //
             teme2ecefOptimised(&ro, epoch, gmstCos, gmstSin, &RGtrf)
-            self.coordinates[satrecIndex][i + currentBufferOffset] = SIMD3<Double>(RGtrf)
+//            self.coordinates[satrecIndex][i + currentBufferOffset] = SIMD3<Double>(RGtrf)
+            self.coordinates[satrecIndex][i + currentBufferOffset] = SIMD3<Double>(ro)
         })
     }
     
