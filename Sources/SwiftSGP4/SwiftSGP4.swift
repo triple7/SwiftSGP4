@@ -79,9 +79,6 @@ public class SwiftSGP4 {
             let jdEpoch = timestampToJD(epoch)
             let currentDate = Date()
             let currentJd = timestampToJD(currentDate)
-            print("\(target.NORAD_CAT_ID) jdEpoch: \(jdEpoch)")
-            print("\(target.NORAD_CAT_ID) currentDate: \(currentDate)")
-            print("\(target.NORAD_CAT_ID) currentJd: \(currentJd)")
             
             let lastTSince = (currentJd - jdEpoch) * 1440.0
             print("\(target.NORAD_CAT_ID) lastTSince: \(lastTSince)")
