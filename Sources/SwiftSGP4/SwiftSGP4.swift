@@ -36,10 +36,11 @@ public class SwiftSGP4 {
     public init(_ targets: [CelesTrakTarget]) {
         
         self.targets = targets
-        let sattelliteSubsetTargets = [56768, 56771, 56773, 56775, 56776, 56782, 56783, 56786,
-                                       57885,57883,57882,57880,57881,57879,57878,57876,
-                                       57913, 57914, 57915, 57916, 57917, 57918, 57919, 57920, 57921]
-        self.targetCount = sattelliteSubsetTargets.count
+//        let sattelliteSubsetTargets = [56768, 56771, 56773, 56775, 56776, 56782, 56783, 56786,
+//                                       57885,57883,57882,57880,57881,57879,57878,57876,
+//                                       57913, 57914, 57915, 57916, 57917, 57918, 57919, 57920, 57921]
+//        self.targetCount = sattelliteSubsetTargets.count
+        self.targetCount = targets.count
         self.rad = 180.0/self.pi
         self.deg2rad = pi / 180.0
         self.minPDay = 1440
@@ -65,9 +66,9 @@ public class SwiftSGP4 {
 //        print("rra of node\(target.RA_OF_ASC_NODE)")
 
         for target in targets {
-            if !sattelliteSubsetTargets.contains(target.NORAD_CAT_ID){
-                continue
-            }
+//            if !sattelliteSubsetTargets.contains(target.NORAD_CAT_ID){
+//                continue
+//            }
             var satrec = elsetrec()
             satrec.elnum = target.ELEMENT_SET_NO
             satrec.revnum = target.REV_AT_EPOCH
