@@ -113,9 +113,12 @@ public class SwiftSGP4 {
         // and count = seconds*fps
         delta = 1/Double(secondsFromEpoch*60*fps)
 
-            
+        // calculate the JD timestamp right now to pass into the ITRF function
+        let currentDate = Date()
+        let currentJd = timestampToJD(currentDate)
+
         DispatchQueue.concurrentPerform(iterations: self.targetCount, execute:  { i in
-            computeITRF(i, jdEpochs[i], delta)
+            computeITRF(i, jdEpochs[i], delta, currentJd)
         })
         // Double buffer to cycle around
         self.currentBufferOffset = self.currentBufferOffset + self.bufferOffset
@@ -130,12 +133,13 @@ public class SwiftSGP4 {
     private var genSatNum = (Int8(77), Int8(77), Int8(77), Int8(77), Int8(77), Int8(77))
     // using index to circle around the frames buffer
     private var currentBufferOffset:Int = 0
-    public func computeITRF(_ satrecIndex: Int, _ epoch: Double, _ delta: Double) {
+    public func computeITRF(_ satrecIndex: Int, _ epoch: Double, _ delta: Double, _ currentJd: Double) {
         // struct to pass to sgp4 function
         var satrec = satRecs[satrecIndex]
-            
         // Calculate the target states from epoch to secondsFromEpoch
         var lastSince:Double = 0
+        lastSince = (currentJd - epoch) * 1440.0
+        
         DispatchQueue.concurrentPerform(iterations: self.bufferCount, execute:  { i in
             // orbital set
             var ro = [Double](repeating: 0, count: 3)
@@ -143,14 +147,14 @@ public class SwiftSGP4 {
 
             lastSince = lastAppTSince + Double(i+1)*delta
             
-            sgp4(&satrec, lastTimesSince[satrecIndex] + lastSince, &ro, &vo)
+            sgp4(&satrec, lastSince, &ro, &vo)
 //            // transform from TEME to GTRF
-            var RGtrf = [Double](repeating: 0, count: 3)
-            let gmst = gstime(jdut1: epoch)
-            let gmstCos = cos(gmst)
-            let gmstSin = sin(gmst)
-//
-            teme2ecefOptimised(&ro, epoch, gmstCos, gmstSin, &RGtrf)
+//            var RGtrf = [Double](repeating: 0, count: 3)
+//            let gmst = gstime(jdut1: epoch)
+//            let gmstCos = cos(gmst)
+//            let gmstSin = sin(gmst)
+////
+//            teme2ecefOptimised(&ro, epoch, gmstCos, gmstSin, &RGtrf)
 //            self.coordinates[satrecIndex][i + currentBufferOffset] = SIMD3<Double>(RGtrf)
             self.coordinates[satrecIndex][i + currentBufferOffset] = SIMD3<Double>(ro)
         })
