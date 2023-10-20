@@ -145,7 +145,7 @@ public class SwiftSGP4 {
             var ro = [Double](repeating: 0, count: 3)
             var vo = [Double](repeating: 0, count: 3)
 
-            lastSince = lastSince + Double(i+1)*15.0*delta/60.0
+            lastSince = lastSince + Double(i+1)*7.5*delta/60.0
             
             sgp4(&satrec, lastSince, &ro, &vo)
 //            // transform from TEME to GTRF
