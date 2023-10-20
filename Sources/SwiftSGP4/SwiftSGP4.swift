@@ -111,7 +111,7 @@ public class SwiftSGP4 {
         // such that:
         // delta = (1/(60*fps)
         // and count = seconds*fps
-        delta = 1/Double(fps)
+        delta = 1/Double(secondsFromEpoch*60*fps)
 
         // calculate the JD timestamp right now to pass into the ITRF function
         let currentDate = Date()
