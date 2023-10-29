@@ -80,9 +80,9 @@ func dateString2Date( _ dateString: String)->Date {
         let hour = components.hour!.int32()
         let minutes = components.minute!.int32()
         let seconds = Double(components.second!)
-        let milliseconds = Double(components.nanosecond!)/1000.0
+        let milliseconds = Double(components.nanosecond!)/1000000.0
         print(date)
-        print("timestamp to JD: \(day)/\(month) \(hour):\(minutes)")
+        print("timestamp to JD: \(day)/\(month) \(hour):\(minutes):\(seconds): ms \(milliseconds)")
         var jd:Double = 0.0
         var jdFrac:Double = 0.0
         
