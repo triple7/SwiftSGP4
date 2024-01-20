@@ -70,6 +70,7 @@ public class SwiftSGP4 {
 //                continue
 //            }
             var satrec = elsetrec()
+            print(target.CLASSIFICATION_TYPE)
             satrec.elnum = target.ELEMENT_SET_NO
             satrec.revnum = target.REV_AT_EPOCH
             satrec.classification = target.CLASSIFICATION_TYPE.cString(using: .unicode)![0]
