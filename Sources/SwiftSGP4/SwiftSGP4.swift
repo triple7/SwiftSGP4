@@ -75,16 +75,13 @@ public class SwiftSGP4 {
             satrec.classification = target.CLASSIFICATION_TYPE.cString(using: .unicode)![0]
             satrec.ephtype = 0
             let epoch = dateString2Date(target.EPOCH)
-            print("target \(target.NORAD_CAT_ID) has epoch at \(target.EPOCH)")
+//            print("target \(target.NORAD_CAT_ID) has epoch at \(target.EPOCH)")
             let jdEpoch = timestampToJD(epoch)
             let currentDate = Date()
             let currentJd = timestampToJD(currentDate)
-            print("\(target.NORAD_CAT_ID) jdEpoch: \(jdEpoch)")
-            print("\(target.NORAD_CAT_ID) currentDate: \(currentDate)")
-            print("\(target.NORAD_CAT_ID) currentJd: \(currentJd)")
             
             let lastTSince = (currentJd - jdEpoch) * 1440.0
-            print("\(target.NORAD_CAT_ID) lastTSince: \(lastTSince)")
+//            print("\(target.NORAD_CAT_ID) lastTSince: \(lastTSince)")
 
             _ = sgp4init(wgs72, opsMode, &genSatNum
                          , jdEpoch - jd1950, target.BSTAR, target.MEAN_MOTION_DOT/xpdotInv, target.MEAN_MOTION_DDOT/xpdotInv2, target.ECCENTRICITY, target.ARG_OF_PERICENTER*deg2rad, target.INCLINATION*deg2rad, target.MEAN_ANOMALY*deg2rad,
