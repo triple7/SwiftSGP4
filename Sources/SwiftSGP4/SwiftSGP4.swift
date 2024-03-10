@@ -13,7 +13,7 @@ public class SwiftSGP4 {
     private let xpdotInv2:Double
     private let minPDay:Double
     private let secPDay:Double
-
+    
     public var targets:[CelesTrakTarget]
     private var satRecs:[elsetrec]
     public var coordinates:ContiguousArray<ContiguousArray<SIMD3<Double>>>
@@ -36,6 +36,10 @@ public class SwiftSGP4 {
     public init(_ targets: [CelesTrakTarget]) {
         
         self.targets = targets
+//        let sattelliteSubsetTargets = [56768, 56771, 56773, 56775, 56776, 56782, 56783, 56786,
+//                                       57885,57883,57882,57880,57881,57879,57878,57876,
+//                                       57913, 57914, 57915, 57916, 57917, 57918, 57919, 57920, 57921]
+//        self.targetCount = sattelliteSubsetTargets.count
         self.targetCount = targets.count
         self.rad = 180.0/self.pi
         self.deg2rad = pi / 180.0
@@ -62,17 +66,23 @@ public class SwiftSGP4 {
 //        print("rra of node\(target.RA_OF_ASC_NODE)")
 
         for target in targets {
+//            if !sattelliteSubsetTargets.contains(target.NORAD_CAT_ID){
+//                continue
+//            }
             var satrec = elsetrec()
             satrec.elnum = target.ELEMENT_SET_NO
             satrec.revnum = target.REV_AT_EPOCH
             satrec.classification = target.CLASSIFICATION_TYPE.cString(using: .unicode)![0]
             satrec.ephtype = 0
             let epoch = dateString2Date(target.EPOCH)
-           let jdEpoch = timestampToJD(epoch)
-            let currentJd = timestampToJD(Date())
-            let tmOffsetJd = Double(TimeZone.current.secondsFromGMT())/86400
-            let lastTSince = (currentJd - jdEpoch - tmOffsetJd)*1440
+//            print("target \(target.NORAD_CAT_ID) has epoch at \(target.EPOCH)")
+            let jdEpoch = timestampToJD(epoch)
+            let currentDate = Date()
+            let currentJd = timestampToJD(currentDate)
             
+            let lastTSince = (currentJd - jdEpoch) * 1440.0
+//            print("\(target.NORAD_CAT_ID) lastTSince: \(lastTSince)")
+
             _ = sgp4init(wgs72, opsMode, &genSatNum
                          , jdEpoch - jd1950, target.BSTAR, target.MEAN_MOTION_DOT/xpdotInv, target.MEAN_MOTION_DDOT/xpdotInv2, target.ECCENTRICITY, target.ARG_OF_PERICENTER*deg2rad, target.INCLINATION*deg2rad, target.MEAN_ANOMALY*deg2rad,
                          target.MEAN_MOTION/xpdotp, target.RA_OF_ASC_NODE*deg2rad, &satrec)
@@ -90,6 +100,22 @@ public class SwiftSGP4 {
     }
 
     fileprivate var lastAppTSince:Double = 0
+    public func propagateOmmsSingle(){
+        // calculate the JD timestamp right now to pass into the ITRF function
+        let currentDate = Date()
+        let currentJd = timestampToJD(currentDate)
+
+        DispatchQueue.concurrentPerform(iterations: self.targetCount, execute:  { satrecIndex in
+            var satrec = satRecs[satrecIndex]
+            // Calculate the target states from epoch to secondsFromEpoch
+            let lastSince:Double = (currentJd - jdEpochs[satrecIndex]) * 1440.0
+            var ro = [Double](repeating: 0, count: 3)
+            var vo = [Double](repeating: 0, count: 3)
+            sgp4(&satrec, lastSince, &ro, &vo)
+            self.coordinates[satrecIndex][0] = SIMD3<Double>(ro)
+        })
+    }
+
     public func propagateOmms( _ minDelta: Double = 1/60 /* seconds */) {
         
         // time dimension parameters
@@ -100,9 +126,12 @@ public class SwiftSGP4 {
         // and count = seconds*fps
         delta = 1/Double(secondsFromEpoch*60*fps)
 
-            
+        // calculate the JD timestamp right now to pass into the ITRF function
+        let currentDate = Date()
+        let currentJd = timestampToJD(currentDate)
+
         DispatchQueue.concurrentPerform(iterations: self.targetCount, execute:  { i in
-            computeITRF(i, jdEpochs[i], delta)
+            computeITRF(i, jdEpochs[i], delta, currentJd)
         })
         // Double buffer to cycle around
         self.currentBufferOffset = self.currentBufferOffset + self.bufferOffset
@@ -117,28 +146,30 @@ public class SwiftSGP4 {
     private var genSatNum = (Int8(77), Int8(77), Int8(77), Int8(77), Int8(77), Int8(77))
     // using index to circle around the frames buffer
     private var currentBufferOffset:Int = 0
-    public func computeITRF(_ satrecIndex: Int, _ epoch: Double, _ delta: Double) {
+    public func computeITRF(_ satrecIndex: Int, _ epoch: Double, _ delta: Double, _ currentJd: Double) {
         // struct to pass to sgp4 function
         var satrec = satRecs[satrecIndex]
-            
         // Calculate the target states from epoch to secondsFromEpoch
         var lastSince:Double = 0
+        lastSince = (currentJd - epoch) * 1440.0
+        
         DispatchQueue.concurrentPerform(iterations: self.bufferCount, execute:  { i in
             // orbital set
             var ro = [Double](repeating: 0, count: 3)
             var vo = [Double](repeating: 0, count: 3)
 
-            lastSince = lastAppTSince + Double(i+1)*delta
-
-            sgp4(&satrec, lastTimesSince[satrecIndex] + lastSince, &ro, &vo)
-            // transform from TEME to GTRF
-            var RGtrf = [Double](repeating: 0, count: 3)
-            let gmst = gstime(jdut1: epoch)
-            let gmstCos = cos(gmst)
-            let gmstSin = sin(gmst)
-
-            teme2ecefOptimised(&ro, epoch, gmstCos, gmstSin, &RGtrf)
-            self.coordinates[satrecIndex][i + currentBufferOffset] = SIMD3<Double>(RGtrf)
+            lastSince = lastSince + Double(i+1)*delta/15.0
+            
+            sgp4(&satrec, lastSince, &ro, &vo)
+//            // transform from TEME to GTRF
+//            var RGtrf = [Double](repeating: 0, count: 3)
+//            let gmst = gstime(jdut1: epoch)
+//            let gmstCos = cos(gmst)
+//            let gmstSin = sin(gmst)
+////
+//            teme2ecefOptimised(&ro, epoch, gmstCos, gmstSin, &RGtrf)
+//            self.coordinates[satrecIndex][i + currentBufferOffset] = SIMD3<Double>(RGtrf)
+            self.coordinates[satrecIndex][i + currentBufferOffset] = SIMD3<Double>(ro)
         })
     }
     

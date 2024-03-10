@@ -71,23 +71,31 @@ func dateString2Date( _ dateString: String)->Date {
     
     func timestampToJD( _ date: Date)->Double {
         let calendar = Calendar.current
-        let  components  =  calendar.dateComponents([.year, .month, .day, .hour, .minute, .second],  from:  date)
+//        calendar.timeZone = TimeZone(identifier: "UTC")
+//        let components = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second],  from:  date)
+        let components = calendar.dateComponents(in: TimeZone(identifier: "UTC")!, from: date)
         let year = components.year!.int32()
         let month = components.month!.int32()
         let day = components.day!.int32()
         let hour = components.hour!.int32()
         let minutes = components.minute!.int32()
-         let seconds = Double(components.second!)
+        let seconds = Double(components.second!)
+        let milliseconds = Double(components.nanosecond!)/1000000.0
+//        print(date)
+//        print("timestamp to JD: \(day)/\(month) \(hour):\(minutes):\(seconds): ms \(milliseconds)")
         var jd:Double = 0.0
         var jdFrac:Double = 0.0
         
         jday(year, month, day, hour, minutes, seconds, &jd, &jdFrac)
-return jd + jdFrac
+        // BUG: add the millisecond to the jdate
+        jdFrac = jdFrac + milliseconds/86400000.0
+        return jd + jdFrac
     }
 
 extension SwiftSGP4 {
     
     public func framesSinceEpoch( _ date: Date, _ index: Int)->Int {
+        print("self.epochs[index]: \(self.epochs[index])")
         let secondsSinceDelta = date.timeIntervalSince(self.epochs[index])
         let forwardDelta = 1/(secondsSinceDelta*Double(self.fps))
         return Int(ceil(forwardDelta/(delta)))
