@@ -14,54 +14,54 @@ let utc2000Components = DateComponents(year: 2000, month: 1, day: 1)
 let jd2000:Double = 2451545.0
 let utc2000 = calendar.date(from: utc2000Components)!
 
-    func getJulianFromUnix(_ unixSecs: Double) -> Double {
+    public func getJulianFromUnix(_ unixSecs: Double) -> Double {
         return (unixSecs / 86400.0) + 2440587.5
     }
 
-    func getUnixFromJulian(_ julian: Double) -> UInt64 {
+    public func getUnixFromJulian(_ julian: Double) -> UInt64 {
         return UInt64((julian - 2440587.5) * 86400.0 + 0.5)
     }
 
-    func date2jday(_ dt: Date) -> Double {
+    public func date2jday(_ dt: Date) -> Double {
         let dateUnix = dt.timeIntervalSince1970 * 1000
         let deltaMSec = (dateUnix - unix2000)
         let jd = jd2000 + deltaMSec / 86400000.0
         return jd
     }
 
-    func jday2date(_ jd: Double) -> Date {
+    public func jday2date(_ jd: Double) -> Date {
         let jdDeltaMSec = (jd - jd2000) * 86400000.0
         let date = addMilliseconds(utc2000, milliseconds: jdDeltaMSec)
         return date
     }
 
-    func addDays(_ dt: Date, days: Int) -> Date {
+    public func addDays(_ dt: Date, days: Int) -> Date {
         var dateComponents = DateComponents()
         dateComponents.day = days
         let updatedDate = calendar.date(byAdding: dateComponents, to: dt)!
         return updatedDate
     }
 
-    func addMinutes(_ dt: Date, minutes: Int) -> Date {
+    public func addMinutes(_ dt: Date, minutes: Int) -> Date {
         var dateComponents = DateComponents()
         dateComponents.minute = minutes
         let updatedDate = calendar.date(byAdding: dateComponents, to: dt)!
         return updatedDate
     }
 
-    func addSeconds(_ dt: Date, seconds: Int) -> Date {
+    public func addSeconds(_ dt: Date, seconds: Int) -> Date {
         var dateComponents = DateComponents()
         dateComponents.second = seconds
         let updatedDate = calendar.date(byAdding: dateComponents, to: dt)!
         return updatedDate
     }
 
-    func addMilliseconds(_ dt: Date, milliseconds: Double) -> Date {
+    public func addMilliseconds(_ dt: Date, milliseconds: Double) -> Date {
         let updatedDate = dt.addingTimeInterval(milliseconds / 1000)
         return updatedDate
     }
     
-func dateString2Date( _ dateString: String)->Date {
+public func dateString2Date( _ dateString: String)->Date {
         let dateFormat = DateFormatter()
         dateFormat.timeZone = TimeZone(abbreviation: "UTC")
         dateFormat.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
@@ -69,7 +69,7 @@ func dateString2Date( _ dateString: String)->Date {
         return date
     }
     
-    func timestampToJD( _ date: Date)->Double {
+    public func timestampToJD( _ date: Date)->Double {
         let calendar = Calendar.current
 //        calendar.timeZone = TimeZone(identifier: "UTC")
 //        let components = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second],  from:  date)
@@ -94,14 +94,14 @@ func dateString2Date( _ dateString: String)->Date {
 
 extension SwiftSGP4 {
     
-    public func framesSinceEpoch( _ date: Date, _ index: Int)->Int {
+    public public func framesSinceEpoch( _ date: Date, _ index: Int)->Int {
         print("self.epochs[index]: \(self.epochs[index])")
         let secondsSinceDelta = date.timeIntervalSince(self.epochs[index])
         let forwardDelta = 1/(secondsSinceDelta*Double(self.fps))
         return Int(ceil(forwardDelta/(delta)))
     }
     
-    public func steerOffset( _ startDelta: Double, _ index: Int, _ factor: Double = 1)-> (Double, Int) {
+    public public func steerOffset( _ startDelta: Double, _ index: Int, _ factor: Double = 1)-> (Double, Int) {
         let offsetDelta = startDelta - self.delta*factor*60
         if offsetDelta < 0 {
             return (offsetDelta, index)
