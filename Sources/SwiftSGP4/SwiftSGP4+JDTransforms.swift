@@ -94,14 +94,14 @@ public func dateString2Date( _ dateString: String)->Date {
 
 extension SwiftSGP4 {
     
-    public public func framesSinceEpoch( _ date: Date, _ index: Int)->Int {
+    public func framesSinceEpoch( _ date: Date, _ index: Int)->Int {
         print("self.epochs[index]: \(self.epochs[index])")
         let secondsSinceDelta = date.timeIntervalSince(self.epochs[index])
         let forwardDelta = 1/(secondsSinceDelta*Double(self.fps))
         return Int(ceil(forwardDelta/(delta)))
     }
     
-    public public func steerOffset( _ startDelta: Double, _ index: Int, _ factor: Double = 1)-> (Double, Int) {
+    public func steerOffset( _ startDelta: Double, _ index: Int, _ factor: Double = 1)-> (Double, Int) {
         let offsetDelta = startDelta - self.delta*factor*60
         if offsetDelta < 0 {
             return (offsetDelta, index)
