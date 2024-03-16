@@ -9,7 +9,7 @@ import Foundation
 import SwiftCelesTrak
 
 extension SwiftSGP4 {
-    
+
     
     public func toggleActive(noradIds: [Int], active: Bool) {
         DispatchQueue.concurrentPerform(iterations: self.targetCount, execute:  { i in

@@ -116,6 +116,25 @@ public class SwiftSGP4 {
         })
     }
 
+    public func propagateOmmsByDateTimestamp(dates: [Date]) -> [[SIMD3<Double>]] {
+        var output = [[SIMD3<Double>]](repeating: [SIMD3<Double>](repeating: SIMD3<Double>(x: 0, y: 0, z: 0), count: dates.count), count: self.targetCount)
+        // calculate the JD timestamp for each date to calculate the ITRF
+        for (i, date) in dates.enumerated() {
+            let currentJd = timestampToJD(date)
+            
+            DispatchQueue.concurrentPerform(iterations: self.targetCount, execute:  { satrecIndex in
+                var satrec = satRecs[satrecIndex]
+                // Calculate the target states from epoch to secondsFromEpoch
+                let lastSince:Double = (currentJd - jdEpochs[satrecIndex]) * 1440.0
+                var ro = [Double](repeating: 0, count: 3)
+                var vo = [Double](repeating: 0, count: 3)
+                sgp4(&satrec, lastSince, &ro, &vo)
+                output[satrecIndex][i] = SIMD3<Double>(ro)
+            })
+        }
+            return output
+    }
+
     public func propagateOmms( _ minDelta: Double = 1/60 /* seconds */) {
         
         // time dimension parameters
