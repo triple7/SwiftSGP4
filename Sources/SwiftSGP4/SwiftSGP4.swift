@@ -70,6 +70,8 @@ public class SwiftSGP4 {
 //                continue
 //            }
             var satrec = elsetrec()
+//            print(target.CLASSIFICATION_TYPE)
+            satrec.noradID = Int32(target.NORAD_CAT_ID)
             satrec.elnum = target.ELEMENT_SET_NO
             satrec.revnum = target.REV_AT_EPOCH
             satrec.classification = target.CLASSIFICATION_TYPE.cString(using: .unicode)![0]
@@ -82,7 +84,7 @@ public class SwiftSGP4 {
             
             let lastTSince = (currentJd - jdEpoch) * 1440.0
 //            print("\(target.NORAD_CAT_ID) lastTSince: \(lastTSince)")
-
+            
             _ = sgp4init(wgs72, opsMode, &genSatNum
                          , jdEpoch - jd1950, target.BSTAR, target.MEAN_MOTION_DOT/xpdotInv, target.MEAN_MOTION_DDOT/xpdotInv2, target.ECCENTRICITY, target.ARG_OF_PERICENTER*deg2rad, target.INCLINATION*deg2rad, target.MEAN_ANOMALY*deg2rad,
                          target.MEAN_MOTION/xpdotp, target.RA_OF_ASC_NODE*deg2rad, &satrec)
@@ -114,6 +116,29 @@ public class SwiftSGP4 {
             sgp4(&satrec, lastSince, &ro, &vo)
             self.coordinates[satrecIndex][0] = SIMD3<Double>(ro)
         })
+    }
+
+    public func propagateOmmsMinutes(_ minutes: Int = 60, _ noradID: Int) -> [[Double]] {
+        // Get the JD timestamp of the current timestamp then go through the next minutes to create a set of points that the satellite will take
+        let currentDate = Date()
+        let currentJd = timestampToJD(currentDate)
+        var returnPositions: [[Double]] = Array(repeating: [], count: minutes)
+        for satrecIndex in 0..<self.targetCount{
+            var satrec = satRecs[satrecIndex]
+            if satrec.noradID == noradID{
+                // Calculate the orbit positions for n minutes for this satellite
+                for i in 0..<minutes{
+                    // Calculate the target states from epoch to secondsFromEpoch
+                    let lastSince:Double = (currentJd - jdEpochs[satrecIndex]) * 1440.0 + Double(i)
+                    var ro = [Double](repeating: 0, count: 3)
+                    var vo = [Double](repeating: 0, count: 3)
+                    sgp4(&satrec, lastSince, &ro, &vo)
+                    returnPositions[i] = ro
+                }
+            }
+        }
+        
+        return returnPositions
     }
 
     public func propagateOmmsByDateTimestamp(dates: [Date]) -> [[SIMD3<Double>]] {
