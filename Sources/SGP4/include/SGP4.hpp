@@ -55,6 +55,7 @@ typedef struct elsetrec
   char  classification, intldesg[11];
   int   ephtype;
   long  elnum    , revnum;
+  int  noradID;
   double no_unkozai;
   double am     , em     , im     , Om       , om     , mm      , nm;
   double tumin, mus, radiusearthkm, xke, j2, j3, j4, j3oj2;
