@@ -90,6 +90,16 @@ public class SwiftSGP4 {
                          target.MEAN_MOTION/xpdotp, target.RA_OF_ASC_NODE*deg2rad, &satrec)
 
             
+//            // sgp4fix allow additional parameters in the struct
+//            satrec->ndot = xndot;
+//            satrec->nddot = xnddot;
+//            satrec->ecco = xecco;
+//            satrec->argpo = xargpo;
+//            satrec->inclo = xinclo;
+//            satrec->mo = xmo;
+//            // sgp4fix rename variables to clarify which mean motion is intended
+//            satrec->no_kozai = xno_kozai;
+//            satrec->nodeo = xnodeo;            
             satRecs.append(satrec)
             epochs.append(epoch)
             jdEpochs.append(jdEpoch)
@@ -127,7 +137,7 @@ public class SwiftSGP4 {
             if satrec.noradID == noradID {
                 for (i, targetJd) in targetJds.enumerated() {
                     // Calculate the elapsed time since epoch in minutes
-                    let elapsedTimeSinceEpoch: Double = (targetJd - jdEpochs[satrecIndex])
+                    let elapsedTimeSinceEpoch: Double = (targetJd - jdEpochs[satrecIndex]) * 1440.0
                     // Prepare arrays for position (ro) and velocity (vo)
                     var ro = [Double](repeating: 0, count: 3)
                     var vo = [Double](repeating: 0, count: 3)
