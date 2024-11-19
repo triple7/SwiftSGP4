@@ -117,6 +117,32 @@ public class SwiftSGP4 {
             self.coordinates[satrecIndex][0] = SIMD3<Double>(ro)
         })
     }
+    
+    public func propagateOmmsByTargetJds(_ targetJds: [Double], _ noradID: Int) -> [[Double]] {
+        // Initialize an array to store the return positions for each target JD
+        var returnPositions: [[Double]] = Array(repeating: [], count: targetJds.count)
+        for satrecIndex in 0..<self.targetCount {
+            var satrec = satRecs[satrecIndex]
+            // Check if the current satellite matches the specified NORAD ID
+            if satrec.noradID == noradID {
+                for (i, targetJd) in targetJds.enumerated() {
+                    // Calculate the elapsed time since epoch in minutes
+                    let elapsedTimeSinceEpoch: Double = (targetJd - jdEpochs[satrecIndex])
+                    // Prepare arrays for position (ro) and velocity (vo)
+                    var ro = [Double](repeating: 0, count: 3)
+                    var vo = [Double](repeating: 0, count: 3)
+                    // Call sgp4 to compute the position and velocity
+                    sgp4(&satrec, elapsedTimeSinceEpoch, &ro, &vo)
+                    // Store the calculated position (ro) in the result
+                    returnPositions[i] = ro
+                }
+                // Break after finding the matching NORAD ID
+                break
+            }
+        }
+        
+        return returnPositions
+    }
 
     public func propagateOmmsMinutes(_ minutes: Int = 60, _ noradID: Int) -> [[Double]] {
         // Get the JD timestamp of the current timestamp then go through the next minutes to create a set of points that the satellite will take
