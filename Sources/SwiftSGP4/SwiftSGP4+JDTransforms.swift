@@ -61,12 +61,11 @@ let utc2000 = calendar.date(from: utc2000Components)!
         return updatedDate
     }
     
-public func dateString2Date( _ dateString: String)->Date {
+public func dateString2Date( _ dateString: String)->Date? {
         let dateFormat = DateFormatter()
         dateFormat.timeZone = TimeZone(abbreviation: "UTC")
         dateFormat.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
-        let date = dateFormat.date(from: dateString)!
-        return date
+        return dateFormat.date(from: dateString)
     }
     
     public func timestampToJD( _ date: Date)->Double {
